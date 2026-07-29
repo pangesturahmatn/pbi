@@ -102,23 +102,25 @@ $whatsapp = get_theme_mod('pbi_social_whatsapp', '6281334537381');
                         <!-- Dynamic Countdown Box (Show only if countdown date is populated) -->
                         <?php if (!empty($countdown)) : ?>
                             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; text-align: center;">
-                                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; display: block; margin-bottom: 10px;"><i class="fa-solid fa-hourglass-start" style="color: var(--pbi-primary);"></i> Hitung Mundur Acara</span>
-                                <div class="pbi-countdown" data-countdown-date="<?php echo esc_attr($countdown); ?>" style="display: flex; gap: 6px; justify-content: center;">
-                                    <div style="background: var(--pbi-primary); color: #fff; width: 42px; padding: 6px 0; border-radius: 6px; display: flex; flex-direction: column; align-items: center;">
-                                        <span id="pbi-cd-days" style="font-size: 16px; font-weight: 700; line-height: 1.1;">00</span>
-                                        <span style="font-size: 8px; text-transform: uppercase; opacity: 0.8;">Hari</span>
-                                    </div>
-                                    <div style="background: var(--pbi-primary); color: #fff; width: 42px; padding: 6px 0; border-radius: 6px; display: flex; flex-direction: column; align-items: center;">
-                                        <span id="pbi-cd-hours" style="font-size: 16px; font-weight: 700; line-height: 1.1;">00</span>
-                                        <span style="font-size: 8px; text-transform: uppercase; opacity: 0.8;">Jam</span>
-                                    </div>
-                                    <div style="background: var(--pbi-primary); color: #fff; width: 42px; padding: 6px 0; border-radius: 6px; display: flex; flex-direction: column; align-items: center;">
-                                        <span id="pbi-cd-mins" style="font-size: 16px; font-weight: 700; line-height: 1.1;">00</span>
-                                        <span style="font-size: 8px; text-transform: uppercase; opacity: 0.8;">Mnt</span>
-                                    </div>
-                                    <div style="background: var(--pbi-primary); color: #fff; width: 42px; padding: 6px 0; border-radius: 6px; display: flex; flex-direction: column; align-items: center;">
-                                        <span id="pbi-cd-secs" style="font-size: 16px; font-weight: 700; line-height: 1.1;">00</span>
-                                        <span style="font-size: 8px; text-transform: uppercase; opacity: 0.8;">Det</span>
+                                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; display: block; margin-bottom: 12px;"><i class="fa-solid fa-hourglass-start" style="color: var(--pbi-primary); margin-right: 5px;"></i> Hitung Mundur Acara</span>
+                                <div class="pbi-countdown" data-countdown-date="<?php echo esc_attr($countdown); ?>" style="align-items: center; text-align: center; display: flex; flex-direction: column; gap: 0;">
+                                    <div class="pbi-countdown__timer" style="display: flex; gap: 8px; justify-content: center; width: 100%;">
+                                        <div class="pbi-countdown-box" style="background: var(--pbi-primary); min-width: 50px; padding: 8px 6px;">
+                                            <span class="pbi-countdown-box__num" id="pbi-cd-days" style="font-size: 18px; color: #fff;">00</span>
+                                            <span class="pbi-countdown-box__label" style="font-size: 8px; opacity: 0.8; color: #fff;">Hari</span>
+                                        </div>
+                                        <div class="pbi-countdown-box" style="background: var(--pbi-primary); min-width: 50px; padding: 8px 6px;">
+                                            <span class="pbi-countdown-box__num" id="pbi-cd-hours" style="font-size: 18px; color: #fff;">00</span>
+                                            <span class="pbi-countdown-box__label" style="font-size: 8px; opacity: 0.8; color: #fff;">Jam</span>
+                                        </div>
+                                        <div class="pbi-countdown-box" style="background: var(--pbi-primary); min-width: 50px; padding: 8px 6px;">
+                                            <span class="pbi-countdown-box__num" id="pbi-cd-mins" style="font-size: 18px; color: #fff;">00</span>
+                                            <span class="pbi-countdown-box__label" style="font-size: 8px; opacity: 0.8; color: #fff;">Menit</span>
+                                        </div>
+                                        <div class="pbi-countdown-box" style="background: var(--pbi-primary); min-width: 50px; padding: 8px 6px;">
+                                            <span class="pbi-countdown-box__num" id="pbi-cd-secs" style="font-size: 18px; color: #fff;">00</span>
+                                            <span class="pbi-countdown-box__label" style="font-size: 8px; opacity: 0.8; color: #fff;">Detik</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
