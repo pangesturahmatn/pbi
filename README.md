@@ -15,4 +15,4 @@ Repositori ini berisi kode sumber tema WordPress **PBI Company Profile** dan ala
 ## Cara Kerja Deployment Otomatis
 Setiap kali Anda melakukan push kode ke branch `main`, GitHub Actions akan otomatis menyinkronkan file tema ke server cPanel menggunakan FTP.
 
-*Terakhir diperbarui: 29 Juli 2026 (cPanel User Updated).*
+*Terakhir diperbarui: 29 Juli 2026 (Public Repository).*
