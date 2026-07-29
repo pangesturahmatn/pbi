@@ -255,12 +255,12 @@ if (!function_exists('pbi_customize_register')) {
 
         // Video Embed Code
         $wp_customize->add_setting('pbi_about_video', array(
-            'default'           => '<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>',
+            'default'           => 'https://youtu.be/aKb3VjlEcCQ',
             'sanitize_callback' => 'pbi_sanitize_raw_code',
         ));
         $wp_customize->add_control('pbi_about_video', array(
             'label'       => __('Kode Semat Video (YouTube/Vimeo Embed Code)', 'pbi-theme'),
-            'description' => __('Masukkan kode <iframe> semat video dari YouTube atau platform lainnya untuk ditampilkan di bawah halaman.', 'pbi-theme'),
+            'description' => __('Masukkan link YouTube (cth: https://youtu.be/aKb3VjlEcCQ) atau kode embed <iframe> dari YouTube untuk ditampilkan di halaman.', 'pbi-theme'),
             'section'     => 'pbi_about_section',
             'type'        => 'textarea',
         ));
