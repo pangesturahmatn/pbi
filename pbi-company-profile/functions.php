@@ -138,6 +138,7 @@ if (!function_exists('pbi_create_default_pages')) {
                 'title'   => 'Tentang PBI',
                 'slug'    => 'tentang-pbi',
                 'content' => '<p>Pesantren Bisnis Indonesia (PBI) adalah lembaga pelatihan bisnis non-profit yang berfokus pada pengembangan wirausahawan Muslim yang mengutamakan keberkahan dunia dan akhirat.</p>',
+                'template' => 'page-templates/template-about.php',
             ),
             array(
                 'title'    => 'Hubungi Kami',
@@ -207,3 +208,61 @@ add_action('init', function() {
         delete_transient('pbi_flush_rewrite_needed');
     }
 }, 99); // Prioritas 99: setelah semua CPT terdaftar
+
+// =====================================================================
+// 10. UTILITY: Indonesian Date Formatter (WIB UTC+7)
+// =====================================================================
+if (!function_exists('pbi_format_indonesian_date')) {
+    function pbi_format_indonesian_date($date_string) {
+        if (empty($date_string)) return '';
+        $timestamp = strtotime($date_string);
+        if (!$timestamp) {
+            return $date_string; // Jika teks biasa (cth: "31 Juli - 02 Agustus 2026"), kembalikan apa adanya
+        }
+        
+        $original_timezone = date_default_timezone_get();
+        date_default_timezone_set('Asia/Jakarta'); // Paksa ke WIB (UTC+7)
+        
+        $days = array(
+            'Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'
+        );
+        
+        $months = array(
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+            7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        );
+        
+        $day_en = date('l', $timestamp);
+        $day_id = isset($days[$day_en]) ? $days[$day_en] : $day_en;
+        
+        $m_num = intval(date('n', $timestamp));
+        $month_id = isset($months[$m_num]) ? $months[$m_num] : '';
+        
+        $date_formatted = $day_id . ', ' . date('j', $timestamp) . ' ' . $month_id . ' ' . date('Y', $timestamp);
+        
+        date_default_timezone_set($original_timezone);
+        return $date_formatted;
+    }
+}
+
+// Force QSB programs to be open and point to registration link + auto-assign "Tentang PBI" page template
+add_action('init', function() {
+    if (is_admin()) {
+        $qsb_posts = array('qsb-2026-2026', 'quantum-spiritual-business');
+        foreach ($qsb_posts as $slug) {
+            $qsb_post = get_page_by_path($slug, OBJECT, 'pbi_program');
+            if ($qsb_post) {
+                update_post_meta($qsb_post->ID, '_pbi_program_status', 'buka');
+                update_post_meta($qsb_post->ID, '_pbi_program_reg_url', 'https://registrasi.pesantrenbisnisindonesia.org/');
+            }
+        }
+
+        // Auto-assign "Tentang PBI" page template
+        $about_page = get_page_by_path('tentang-pbi', OBJECT, 'page');
+        if ($about_page) {
+            update_post_meta($about_page->ID, '_wp_page_template', 'page-templates/template-about.php');
+        }
+    }
+}, 99);
+
