@@ -238,7 +238,14 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
                     $p_url   = get_post_meta(get_the_ID(), '_pbi_program_reg_url', true);
                     $p_status = get_post_meta(get_the_ID(), '_pbi_program_status', true);
 
-                    $formatted_date = !empty($p_date) ? pbi_format_indonesian_date($p_date) : 'Segera Diumumkan';
+                    $formatted_date = 'Segera Diumumkan';
+                    if (!empty($p_date)) {
+                        if (function_exists('pbi_format_indonesian_date')) {
+                            $formatted_date = pbi_format_indonesian_date($p_date);
+                        } else {
+                            $formatted_date = $p_date;
+                        }
+                    }
                     $status_label = ($p_status === 'tutup') ? 'Pendaftaran Ditutup' : 'Daftar Sekarang';
                     $status_class = ($p_status === 'tutup') ? 'pbi-btn--disabled' : 'pbi-btn--accent';
                     $target_url = ($p_status === 'tutup') ? '#' : (!empty($p_url) ? $p_url : get_the_permalink());
