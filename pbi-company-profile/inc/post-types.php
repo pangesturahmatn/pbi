@@ -191,6 +191,12 @@ if (!function_exists('pbi_render_program_meta_box')) {
         $location  = get_post_meta($post->ID, '_pbi_program_location', true);
         $wa        = get_post_meta($post->ID, '_pbi_program_wa', true);
         $countdown = get_post_meta($post->ID, '_pbi_program_countdown_target', true);
+        $reg_url   = get_post_meta($post->ID, '_pbi_program_reg_url', true);
+        $status    = get_post_meta($post->ID, '_pbi_program_status', true);
+
+        if (empty($status)) {
+            $status = 'buka';
+        }
 
         // Set default WhatsApp if empty
         if (empty($wa)) {
@@ -218,6 +224,21 @@ if (!function_exists('pbi_render_program_meta_box')) {
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_program_wa">No. WhatsApp Panitia Pendaftaran (Khusus Program ini)</label>
                 <input type="text" id="pbi_program_wa" name="pbi_program_wa" value="<?php echo esc_attr($wa); ?>" placeholder="Contoh: 6281334537381 (Gunakan awalan 62 tanpa spasi/tanda hubung)" style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px; color: var(--pbi-primary);" for="pbi_program_reg_url">Link Pendaftaran (Form / Website) - Opsional</label>
+                <input type="url" id="pbi_program_reg_url" name="pbi_program_reg_url" value="<?php echo esc_url($reg_url); ?>" placeholder="Contoh: https://registrasi.pesantrenbisnisindonesia.org/" style="width: 100%; padding: 8px; font-size: 14px;" />
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #64748b;">Jika dikosongkan, tombol pendaftaran di website akan otomatis diarahkan ke WhatsApp Panitia.</p>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_program_status">Status Pendaftaran</label>
+                <select id="pbi_program_status" name="pbi_program_status" style="width: 100%; padding: 8px; font-size: 14px;">
+                    <option value="buka" <?php selected($status, 'buka'); ?>>Buka (Daftar Sekarang)</option>
+                    <option value="tutup" <?php selected($status, 'tutup'); ?>>Tutup (Pendaftaran Ditutup)</option>
+                </select>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #64748b;">Menentukan apakah pendaftaran di halaman depan masih dibuka atau ditutup.</p>
             </div>
 
             <div style="margin-bottom: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
@@ -304,6 +325,12 @@ if (!function_exists('pbi_save_custom_meta_boxes_data')) {
             }
             if (isset($_POST['pbi_program_countdown_target'])) {
                 update_post_meta($post_id, '_pbi_program_countdown_target', sanitize_text_field($_POST['pbi_program_countdown_target']));
+            }
+            if (isset($_POST['pbi_program_reg_url'])) {
+                update_post_meta($post_id, '_pbi_program_reg_url', esc_url_raw($_POST['pbi_program_reg_url']));
+            }
+            if (isset($_POST['pbi_program_status'])) {
+                update_post_meta($post_id, '_pbi_program_status', sanitize_text_field($_POST['pbi_program_status']));
             }
         }
 

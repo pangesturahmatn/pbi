@@ -124,11 +124,25 @@ $whatsapp = get_theme_mod('pbi_social_whatsapp', '6281334537381');
                             </div>
                         <?php endif; ?>
 
-                        <!-- WhatsApp Registration Button -->
+                        <!-- Dynamic Registration Button -->
                         <div>
-                            <a href="https://wa.me/<?php echo esc_attr(preg_replace('/[^0-9]/', '', $wa_panitia)); ?>?text=<?php echo rawurlencode('Assalamualaikum Admin PBI, saya berminat mendaftar Program: ' . get_the_title()); ?>" target="_blank" rel="noopener" style="background: #25d366; color: #fff; text-align: center; text-decoration: none; padding: 12px 20px; border-radius: 30px; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(37,211,102,0.25); transition: all 0.3s ease;">
-                                <i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i> Daftar via WhatsApp
-                            </a>
+                            <?php 
+                            $p_status  = get_post_meta(get_the_ID(), '_pbi_program_status', true);
+                            $p_reg_url = get_post_meta(get_the_ID(), '_pbi_program_reg_url', true);
+                            
+                            if ($p_status === 'tutup') : ?>
+                                <button disabled style="background: #cbd5e1; color: #94a3b8; text-align: center; border: none; padding: 12px 20px; border-radius: 30px; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: not-allowed;">
+                                    <i class="fa-solid fa-lock"></i> Pendaftaran Ditutup
+                                </button>
+                            <?php elseif (!empty($p_reg_url)) : ?>
+                                <a href="<?php echo esc_url($p_reg_url); ?>" target="_blank" rel="noopener" style="background: var(--pbi-accent); color: #fff; text-align: center; text-decoration: none; padding: 12px 20px; border-radius: 30px; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(212,175,55,0.25); transition: all 0.3s ease; width: 100%;">
+                                    <i class="fa-solid fa-graduation-cap" style="font-size: 16px;"></i> Daftar Sekarang (Online)
+                                </a>
+                            <?php else : ?>
+                                <a href="https://wa.me/<?php echo esc_attr(preg_replace('/[^0-9]/', '', $wa_panitia)); ?>?text=<?php echo rawurlencode('Assalamualaikum Admin PBI, saya berminat mendaftar Program: ' . get_the_title()); ?>" target="_blank" rel="noopener" style="background: #25d366; color: #fff; text-align: center; text-decoration: none; padding: 12px 20px; border-radius: 30px; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(37,211,102,0.25); transition: all 0.3s ease; width: 100%;">
+                                    <i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i> Daftar via WhatsApp
+                                </a>
+                            <?php endif; ?>
                         </div>
 
                         <a href="<?php echo esc_url(get_post_type_archive_link('pbi_program')); ?>" style="color: var(--pbi-primary); font-weight: 600; font-size: 13px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; border-top: 1px solid #f1f5f9; padding-top: 15px;">
