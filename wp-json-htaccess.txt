@@ -1,0 +1,25 @@
+# PBI WordPress REST API - Disable mod_security for wp-json endpoint
+# Upload file ini ke: public_html/wp-json/.htaccess
+
+<IfModule mod_security.c>
+    SecRuleEngine Off
+    SecFilterEngine Off
+    SecFilterScanPOST Off
+</IfModule>
+
+<IfModule mod_security2.c>
+    SecRuleEngine Off
+</IfModule>
+
+# Izinkan semua method HTTP
+<Limit GET POST PUT PATCH DELETE OPTIONS>
+    Require all granted
+</Limit>
+
+# Disable size limit untuk REST API requests
+LimitRequestBody 0
+
+# Pastikan CORS headers terkirim
+Header always set Access-Control-Allow-Origin "*"
+Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+Header always set Access-Control-Allow-Headers "Authorization, Content-Type, X-WP-Nonce"

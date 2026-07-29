@@ -1,0 +1,986 @@
+/* Main Stylesheet for PBI Theme
+ * Author: Pangestu Rahmat N (arumsaricorporation.co.id)
+ */
+
+:root {
+    /* Color Tokens (Will be partially overridden by Customizer dynamic styles) */
+    --pbi-primary: #0B4628;
+    --pbi-primary-hover: #072e1a;
+    --pbi-accent: #D4AF37;
+    --pbi-accent-glow: rgba(212, 175, 55, 0.25);
+    --pbi-charcoal: #1E293B;
+    --pbi-bg-soft: #F8F9FA;
+    --pbi-bg-card: #FFFFFF;
+    --pbi-border: #E2E8F0;
+    --pbi-text-muted: #64748B;
+    
+    /* Typography Tokens */
+    --pbi-font-headings: 'Outfit', sans-serif;
+    --pbi-font-body: 'Inter', sans-serif;
+
+    /* Metallic Gold Gradients */
+    --pbi-gold-linear: linear-gradient(90deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%);
+    --pbi-gold-metallic: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%);
+    --pbi-gold-metallic-hover: linear-gradient(135deg, #b38728 0%, #fcf6ba 50%, #bf953f 100%);
+}
+
+/* Reset and Global Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--pbi-font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--pbi-charcoal);
+    background-color: var(--pbi-bg-soft);
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--pbi-font-headings);
+    font-weight: 700;
+    color: var(--pbi-charcoal);
+    line-height: 1.3;
+}
+
+a {
+    color: var(--pbi-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--pbi-accent);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Layout Utilities */
+.pbi-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.pbi-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+
+.pbi-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+@media (max-width: 768px) {
+    .pbi-grid-2, .pbi-grid-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Section Common Styles */
+.pbi-section {
+    padding: 80px 0;
+}
+
+.pbi-section--light {
+    background-color: #FFFFFF;
+}
+
+.pbi-section-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 50px auto;
+}
+
+.pbi-section-header h2 {
+    font-size: 32px;
+    margin: 12px 0;
+}
+
+.pbi-section-header p {
+    color: var(--pbi-text-muted);
+}
+
+.pbi-badge {
+    background-color: var(--pbi-accent-glow);
+    color: var(--pbi-charcoal);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    letter-spacing: 0.5px;
+}
+
+/* Button Component */
+.pbi-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-family: var(--pbi-font-headings);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.pbi-btn--primary {
+    background-color: var(--pbi-primary);
+    color: #FFFFFF;
+}
+
+.pbi-btn--primary:hover {
+    background-color: var(--pbi-primary-hover);
+    color: #FFFFFF;
+    transform: translateY(-2px);
+}
+
+.pbi-btn--accent {
+    background: var(--pbi-gold-metallic);
+    color: #072e1a !important;
+    border: none;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(186, 140, 48, 0.25);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.pbi-btn--accent:hover {
+    background: var(--pbi-gold-metallic-hover);
+    color: #072e1a !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(186, 140, 48, 0.4);
+}
+
+/* Shimmer reflection sweep animation */
+@keyframes pbi-shimmer {
+    0% { left: -150%; }
+    40% { left: -150%; }
+    100% { left: 150%; }
+}
+
+.pbi-btn--accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-25deg);
+    animation: pbi-shimmer 4.5s infinite ease-in-out;
+}
+
+.pbi-btn--outline {
+    background: transparent;
+    border-color: #FFFFFF;
+    color: #FFFFFF;
+}
+
+.pbi-btn--outline:hover {
+    background-color: #FFFFFF;
+    color: var(--pbi-primary);
+}
+
+.pbi-btn--large {
+    padding: 14px 30px;
+    font-size: 16px;
+}
+
+.pbi-btn--full {
+    display: flex;
+    width: 100%;
+}
+
+.pbi-btn--disabled {
+    background-color: var(--pbi-border);
+    color: var(--pbi-text-muted);
+    cursor: not-allowed;
+}
+
+@keyframes pbi-pulse-btn {
+    0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+
+.pbi-btn--pulse {
+    animation: pbi-pulse-btn 2s infinite;
+}
+
+/* Header & Sticky Navigation */
+.pbi-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    background-color: rgba(255, 255, 255, 0.95);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+/* Sliding and Fading Topbar utility rules */
+.pbi-topbar {
+    transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+    max-height: 40px;
+    opacity: 1;
+    overflow: hidden;
+}
+
+.sticky .pbi-topbar {
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    opacity: 0 !important;
+}
+
+/* Admin Bar offsets */
+body.admin-bar .pbi-header {
+    top: 32px;
+}
+@media screen and (max-width: 782px) {
+    body.admin-bar .pbi-header {
+        top: 46px;
+    }
+}
+
+.pbi-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--pbi-gold-linear);
+}
+
+.pbi-header.sticky {
+    background-color: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.pbi-header__wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    transition: padding 0.3s ease;
+}
+
+.pbi-header.sticky .pbi-header__wrapper {
+    padding: 6px 15px;
+}
+
+.pbi-header__site-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--pbi-primary);
+}
+
+.pbi-nav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.pbi-nav__menu {
+    display: flex;
+    list-style: none;
+    gap: 24px;
+}
+
+.pbi-nav__menu a {
+    font-family: var(--pbi-font-headings);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--pbi-charcoal);
+}
+
+.pbi-nav__menu a:hover {
+    color: var(--pbi-primary);
+}
+
+/* Hamburger mobile button */
+.pbi-menu-toggle {
+    display: none;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding: 0 !important;
+    cursor: pointer;
+    flex-direction: column !important;
+    gap: 5px !important;
+    z-index: 100000;
+    width: 30px !important;
+    height: 30px !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.pbi-menu-toggle__bar {
+    width: 24px !important;
+    height: 3px !important;
+    background-color: var(--pbi-accent) !important; /* Gold premium bars */
+    border-radius: 2px !important;
+    transition: all 0.3s !important;
+    display: block !important;
+}
+
+@media (max-width: 991px) {
+    .pbi-menu-toggle {
+        display: flex;
+    }
+    
+    .pbi-nav {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 300px;
+        height: 100vh;
+        background-color: #FFFFFF;
+        box-shadow: -10px 0 30px rgba(0,0,0,0.05);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 99999;
+        gap: 40px;
+    }
+    
+    .pbi-nav.active {
+        right: 0;
+    }
+    
+    .pbi-nav__menu {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+    
+    .pbi-menu-toggle.active .pbi-menu-toggle__bar:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 6px);
+    }
+    
+    .pbi-menu-toggle.active .pbi-menu-toggle__bar:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .pbi-menu-toggle.active .pbi-menu-toggle__bar:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -6px);
+    }
+}
+
+/* Hero Section */
+.pbi-hero {
+    position: relative;
+    background: linear-gradient(135deg, var(--pbi-primary), #072e1a);
+    padding: 180px 0 100px 0;
+    color: #FFFFFF;
+    overflow: hidden;
+}
+
+.pbi-hero__wrapper {
+    position: relative;
+    z-index: 2;
+}
+
+.pbi-hero__content {
+    max-width: 700px;
+}
+
+.pbi-hero__title {
+    font-size: 48px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+    .pbi-hero__title {
+        font-size: 34px;
+    }
+}
+
+.pbi-hero__subtitle {
+    font-size: 18px;
+    opacity: 0.85;
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+
+.pbi-hero__glow {
+    position: absolute;
+    top: 50%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--pbi-accent-glow) 0%, rgba(212, 175, 55, 0) 70%);
+    z-index: 1;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* Cards & Grid list items */
+.pbi-card {
+    background-color: var(--pbi-bg-card);
+    border: 1px solid var(--pbi-border);
+    border-radius: 12px;
+    padding: 30px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pbi-card--interactive:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px var(--pbi-accent-glow);
+    border-color: var(--pbi-accent);
+}
+
+.pbi-card__icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 24px;
+}
+
+.pbi-card__icon--green { background-color: rgba(11, 70, 40, 0.1); color: var(--pbi-primary); }
+.pbi-card__icon--gold { background-color: rgba(212, 175, 55, 0.1); color: var(--pbi-accent); }
+.pbi-card__icon--blue { background-color: rgba(13, 110, 253, 0.1); color: #0d6efd; }
+
+.pbi-card h3 {
+    margin-bottom: 12px;
+    font-size: 20px;
+}
+
+.pbi-card p {
+    color: var(--pbi-text-muted);
+    font-size: 14.5px;
+    line-height: 1.6;
+}
+
+/* Program Card Special styling */
+.pbi-card--program {
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.pbi-card__media {
+    height: 200px;
+    overflow: hidden;
+}
+
+.pbi-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pbi-card--program .pbi-card__body {
+    padding: 24px;
+}
+
+.pbi-card__meta-date {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pbi-accent);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.pbi-card__location {
+    font-size: 13px;
+    color: var(--pbi-text-muted);
+    margin-top: 5px;
+}
+
+/* Stats Counter Banner styles */
+.pbi-stats {
+    background-color: var(--pbi-primary);
+    color: #FFFFFF;
+    padding: 60px 0;
+}
+
+.pbi-stats__grid {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+.pbi-stat-item {
+    text-align: center;
+}
+
+.pbi-stat-item__number {
+    font-family: var(--pbi-font-headings);
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--pbi-accent);
+    display: block;
+    line-height: 1.1;
+    margin-bottom: 6px;
+}
+
+.pbi-stat-item__label {
+    font-size: 14px;
+    opacity: 0.85;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .pbi-stats__grid {
+        flex-direction: column;
+    }
+}
+
+/* Footer layout */
+.pbi-footer {
+    background-color: #072e1a;
+    color: rgba(255, 255, 255, 0.75);
+    padding: 80px 0 0 0;
+    position: relative;
+}
+
+.pbi-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--pbi-gold-linear);
+}
+
+.pbi-footer__grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 50px;
+    padding-bottom: 50px;
+}
+
+@media (max-width: 991px) {
+    .pbi-footer__grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
+.pbi-footer-widget__title {
+    color: #FFFFFF;
+    font-size: 18px;
+    margin-bottom: 24px;
+    position: relative;
+    padding-bottom: 12px;
+}
+
+.pbi-footer-widget__title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background: var(--pbi-gold-linear);
+    border-radius: 2px;
+}
+
+.pbi-footer__menu {
+    list-style: none;
+}
+
+.pbi-footer__menu li {
+    margin-bottom: 12px;
+}
+
+.pbi-footer__menu a {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.pbi-footer__menu a:hover {
+    color: var(--pbi-accent);
+}
+
+.pbi-footer__contact-info {
+    list-style: none;
+}
+
+.pbi-footer__contact-info li {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.pbi-footer__contact-info i {
+    color: var(--pbi-accent);
+}
+
+.pbi-footer__socials {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.pbi-footer__socials a {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.pbi-footer__socials a:hover {
+    background-color: var(--pbi-accent);
+    color: var(--pbi-charcoal);
+}
+
+.pbi-footer__bottom {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 24px 0;
+    font-size: 13.5px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pbi-footer__bottom-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.pbi-credits a {
+    color: var(--pbi-accent);
+    font-weight: 500;
+}
+
+.pbi-credits a:hover {
+    text-decoration: underline;
+}
+
+/* Helper CTA block custom style */
+.pbi-cta-block {
+    background: linear-gradient(135deg, var(--pbi-primary), #072e1a);
+    color: #FFFFFF;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    margin: 40px auto;
+    max-width: 900px;
+}
+
+.pbi-cta-block h3 {
+    font-size: 26px;
+    color: #FFFFFF;
+    margin-bottom: 12px;
+}
+
+.pbi-cta-block p {
+    font-size: 15px;
+    opacity: 0.85;
+    margin-bottom: 24px;
+}
+
+/* Floating WhatsApp Button */
+.pbi-float-wa {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: #25D366;
+    color: #FFFFFF !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+    z-index: 99999;
+    transition: all 0.3s ease;
+}
+
+.pbi-float-wa:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6);
+    color: #FFFFFF !important;
+}
+
+/* Prayer Times & Event Countdown Widget Section */
+.pbi-widget-bar {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    margin-top: -60px; /* Pull it up into the Hero bottom slightly */
+    position: relative;
+    z-index: 10;
+    border: 1px solid var(--pbi-border);
+}
+
+.pbi-widget-bar__grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 40px;
+}
+
+@media (max-width: 991px) {
+    .pbi-widget-bar {
+        margin-top: 40px;
+    }
+    .pbi-widget-bar__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pbi-prayer-times {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.pbi-prayer-times__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pbi-prayer-times__title {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--pbi-primary);
+}
+
+.pbi-prayer-times__location {
+    font-size: 13px;
+    color: var(--pbi-text-muted);
+}
+
+.pbi-prayer-times__grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+@media (max-width: 576px) {
+    .pbi-prayer-times__grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+}
+
+.pbi-prayer-card {
+    background-color: var(--pbi-bg-soft);
+    border: 1px solid var(--pbi-border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.pbi-prayer-card.active {
+    border-color: var(--pbi-accent);
+    background: linear-gradient(135deg, rgba(11, 70, 40, 0.03) 0%, rgba(212, 175, 55, 0.05) 100%);
+    box-shadow: 0 4px 12px var(--pbi-accent-glow);
+}
+
+.pbi-prayer-card__name {
+    font-size: 13px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.pbi-prayer-card__time {
+    font-family: var(--pbi-font-headings);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--pbi-primary);
+}
+
+.pbi-prayer-card.active .pbi-prayer-card__time {
+    color: var(--pbi-accent);
+}
+
+/* Countdown Clock Styles */
+.pbi-countdown {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    justify-content: center;
+}
+
+.pbi-countdown__title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--pbi-text-muted);
+}
+
+.pbi-countdown__timer {
+    display: flex;
+    gap: 12px;
+}
+
+.pbi-countdown-box {
+    background-color: var(--pbi-charcoal);
+    color: #FFFFFF;
+    border-radius: 8px;
+    padding: 10px;
+    min-width: 65px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.pbi-countdown-box__num {
+    font-family: var(--pbi-font-headings);
+    font-size: 24px;
+    font-weight: 700;
+    display: block;
+    color: var(--pbi-accent);
+}
+
+.pbi-countdown-box__label {
+    font-size: 10px;
+    opacity: 0.7;
+    text-transform: uppercase;
+    display: block;
+}
+
+/* --- Brand Logo & Header Layout Reset --- */
+.pbi-header__brand img,
+.custom-logo-link,
+.custom-logo {
+    display: block !important;
+    max-height: 52px !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.pbi-header__logo-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    text-decoration: none !important;
+}
+
+/* Medium viewport gap reduction for laptop screens */
+@media (max-width: 1200px) and (min-width: 992px) {
+    .pbi-nav {
+        gap: 15px !important;
+    }
+    .pbi-nav__menu {
+        gap: 12px !important;
+    }
+    .pbi-header__site-title {
+        font-size: 13px !important;
+    }
+    .pbi-nav__menu a {
+        font-size: 13px !important;
+    }
+}
+
+/* Mobile & Tablet Header and Layout Adjustments */
+@media (max-width: 991px) {
+    .pbi-header__site-title {
+        font-size: 14px !important;
+    }
+    .pbi-header__brand img {
+        max-height: 45px !important;
+    }
+    .pbi-widget-bar {
+        padding: 15px !important;
+    }
+    .pbi-widget-bar__grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+    .pbi-prayer-times__grid {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 6px !important;
+        overflow-x: auto;
+    }
+    .pbi-prayer-card {
+        padding: 8px 4px !important;
+        min-width: 60px;
+    }
+    .pbi-prayer-card__name {
+        font-size: 10px !important;
+    }
+    .pbi-prayer-card__time {
+        font-size: 12px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .pbi-prayer-times__grid {
+        display: grid !important;
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 4px !important;
+    }
+    .pbi-prayer-card {
+        padding: 6px 2px !important;
+        min-width: unset !important;
+    }
+    .pbi-prayer-card__name {
+        font-size: 9px !important;
+    }
+    .pbi-prayer-card__time {
+        font-size: 10px !important;
+    }
+    .pbi-countdown__timer {
+        justify-content: center !important;
+    }
+}
+
+/* --- Banner Header Spacing Clearance for Fixed Header --- */
+.pbi-page-header {
+    padding-top: 165px !important; /* Topbar (35px) + Header Row (70px) + Banner Gap (60px) */
+    transition: padding-top 0.3s ease;
+}
+
+@media (max-width: 991px) {
+    .pbi-page-header {
+        padding-top: 135px !important; /* Shorter header on mobile viewports */
+    }
+}
