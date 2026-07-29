@@ -21,4 +21,4 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         port: 21
         local-dir: ./pbi-company-profile/
-        server-dir: /public_html/wp-content/themes/pbi-company-profile/
+        server-dir: /pesantrenbisnisindonesia.org/wp-content/themes/pbi-company-profile/
