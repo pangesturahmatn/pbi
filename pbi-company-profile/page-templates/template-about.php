@@ -28,7 +28,7 @@ $about_video = get_theme_mod('pbi_about_video', '<iframe width="560" height="315
     <div class="pbi-container" style="padding: 60px 15px; max-width: 900px; margin: 0 auto;">
         
         <!-- Main WYSIWYG Content from WordPress Editor -->
-        <div class="pbi-entry-content" style="font-size: 17px; line-height: 1.8; color: var(--pbi-charcoal); margin-bottom: 50px;">
+        <div class="pbi-entry-content" style="font-size: 17px; line-height: 1.8; color: var(--pbi-charcoal); margin-bottom: 40px;">
             <?php 
             while (have_posts()) : the_post();
                 the_content();
@@ -36,9 +36,41 @@ $about_video = get_theme_mod('pbi_about_video', '<iframe width="560" height="315
             ?>
         </div>
 
-        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 40px 0;">
+        <!-- Section: Visi & Misi -->
+        <div class="pbi-about-visi-misi" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 50px;">
+            <div style="background: #ffffff; padding: 30px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                <h3 style="color: var(--pbi-primary); font-size: 22px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; margin-top: 0;">
+                    <i class="fa-solid fa-eye" style="color: var(--pbi-accent);"></i> Visi Kami
+                </h3>
+                <p style="font-size: 15.5px; line-height: 1.7; color: #475569; margin: 0;">
+                    "Mewujudkan 1 Juta Pengusaha Muslim Tangguh, Mulia, dan Gemar Berbagi yang menjadi pilar utama kebangkitan ekonomi umat secara nasional."
+                </p>
+            </div>
+            
+            <div style="background: #ffffff; padding: 30px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                <h3 style="color: var(--pbi-primary); font-size: 22px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; margin-top: 0;">
+                    <i class="fa-solid fa-bullseye" style="color: var(--pbi-accent);"></i> Misi Kami
+                </h3>
+                <ul style="padding-left: 20px; font-size: 14.5px; color: #475569; display: flex; flex-direction: column; gap: 10px; margin: 0;">
+                    <li>Menyelenggarakan pelatihan spiritualpreneurship terapan secara profesional dan gratis bagi umat.</li>
+                    <li>Membina mental spiritual pengusaha Muslim agar berorientasi pada keberkahan hidup dunia dan akhirat.</li>
+                    <li>Menggerakkan kepedulian sosial melalui ziswaf produktif guna menopang pemberdayaan ekonomi lemah.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <style>
+        @media (max-width: 768px) {
+            .pbi-about-visi-misi {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+            }
+        }
+        </style>
 
-        <!-- Video Showcase Section (Video Lama) -->
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 50px 0;">
+
+        <!-- Video Showcase Section (Video Lama/Baru) -->
         <div class="pbi-video-section" style="margin-top: 40px; text-align: center;">
             <div style="margin-bottom: 25px;">
                 <span style="font-size: 13px; font-weight: 700; color: var(--pbi-accent); text-transform: uppercase; letter-spacing: 1.5px; display: inline-block; margin-bottom: 8px;">Dokumentasi Perjalanan</span>
@@ -50,13 +82,78 @@ $about_video = get_theme_mod('pbi_about_video', '<iframe width="560" height="315
             <div class="pbi-video-container" style="max-width: 800px; margin: 0 auto;">
                 <div class="pbi-video-wrapper">
                     <?php 
-                    // Output the embed code directly
+                    // Helper to resolve simple YouTube URLs into embeds
+                    if (!function_exists('pbi_get_youtube_embed')) {
+                        function pbi_get_youtube_embed($url_or_iframe) {
+                            if (empty($url_or_iframe)) return '';
+                            if (strpos($url_or_iframe, '<iframe') !== false) {
+                                return $url_or_iframe;
+                            }
+                            $url = trim($url_or_iframe);
+                            $video_id = '';
+                            if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url, $match)) {
+                                $video_id = $match[1];
+                            }
+                            if (!empty($video_id)) {
+                                return '<iframe src="https://www.youtube.com/embed/' . esc_attr($video_id) . '" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+                            }
+                            if (filter_var($url, FILTER_VALIDATE_URL)) {
+                                return '<video src="' . esc_url($url) . '" controls style="width:100%; max-height:450px; border-radius:12px;"></video>';
+                            }
+                            return $url_or_iframe;
+                        }
+                    }
+
+                    // Output embed code
                     if (!empty($about_video)) {
-                        echo $about_video;
+                        echo pbi_get_youtube_embed($about_video);
                     } else {
                         echo '<p style="padding: 40px; background: #f1f5f9; border-radius: 8px; color: #64748b;">Belum ada video yang disematkan.</p>';
                     }
                     ?>
+                </div>
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 50px 0;">
+
+        <!-- Section: Pendiri & Pengurus Inti -->
+        <div class="pbi-about-founders" style="margin-top: 40px;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <span style="font-size: 13px; font-weight: 700; color: var(--pbi-accent); text-transform: uppercase; letter-spacing: 1.5px; display: inline-block; margin-bottom: 8px;">Tokoh & Pengurus</span>
+                <h2 style="font-size: 28px; font-weight: 700; color: var(--pbi-primary); margin: 0;">Pendiri & Pengurus Inti</h2>
+                <p style="color: #64748b; margin-top: 5px; font-size: 15px;">Para penggerak utama perjuangan dakwah ekonomi Pesantren Bisnis Indonesia</p>
+            </div>
+            
+            <div class="pbi-grid-3">
+                <!-- Founder Card -->
+                <div class="pbi-card pbi-card--interactive" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; text-align: center; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; margin-bottom: 20px; border: 4px solid rgba(212,175,55,0.2); background: #f1f5f9; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-user-tie" style="font-size: 55px; color: #94a3b8;"></i>
+                    </div>
+                    <h3 style="margin: 0; font-size: 18px; color: var(--pbi-primary); line-height: 1.3;">Ustadz H. Samsul Arifin, SBC</h3>
+                    <p style="font-size: 12px; font-weight: 700; color: var(--pbi-accent); margin: 6px 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px;">Founder & Guru Utama PBI</p>
+                    <p style="font-size: 13.5px; color: #64748b; line-height: 1.65; margin: 0;">Inisiator utama and perintis gerakan pelatihan dakwah wirausaha Pesantren Bisnis Indonesia secara nasional.</p>
+                </div>
+
+                <!-- Pengurus Card 1 -->
+                <div class="pbi-card pbi-card--interactive" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; text-align: center; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; margin-bottom: 20px; border: 4px solid rgba(11,70,40,0.1); background: #f1f5f9; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-user" style="font-size: 55px; color: #94a3b8;"></i>
+                    </div>
+                    <h3 style="margin: 0; font-size: 18px; color: var(--pbi-primary); line-height: 1.3;">Dewan Pengurus Pusat</h3>
+                    <p style="font-size: 12px; font-weight: 700; color: var(--pbi-accent); margin: 6px 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px;">Pengurus Inti PBI</p>
+                    <p style="font-size: 13.5px; color: #64748b; line-height: 1.65; margin: 0;">Mengelola kegiatan operasional harian, koordinasi daerah, dan pelaksanaan program-program dakwah PBI pusat.</p>
+                </div>
+
+                <!-- Pengurus Card 2 -->
+                <div class="pbi-card pbi-card--interactive" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; text-align: center; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; margin-bottom: 20px; border: 4px solid rgba(11,70,40,0.1); background: #f1f5f9; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-user-group" style="font-size: 45px; color: #94a3b8;"></i>
+                    </div>
+                    <h3 style="margin: 0; font-size: 18px; color: var(--pbi-primary); line-height: 1.3;">Koordinator Wilayah</h3>
+                    <p style="font-size: 12px; font-weight: 700; color: var(--pbi-accent); margin: 6px 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px;">Pengurus Daerah</p>
+                    <p style="font-size: 13.5px; color: #64748b; line-height: 1.65; margin: 0;">Mengawal jejaring sinergi alumni daerah, kajian wirausaha rutin, serta program UMKM binaan di tingkat regional.</p>
                 </div>
             </div>
         </div>

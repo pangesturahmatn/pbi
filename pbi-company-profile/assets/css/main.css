@@ -984,3 +984,47 @@ body.admin-bar .pbi-header {
         padding-top: 135px !important; /* Shorter header on mobile viewports */
     }
 }
+
+/* --- Pagination Styles --- */
+.pbi-pagination {
+    margin-top: 50px;
+    text-align: center;
+}
+.pbi-pagination .nav-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.pbi-pagination .page-numbers {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    background: #ffffff;
+}
+.pbi-pagination .page-numbers:hover {
+    border-color: var(--pbi-primary);
+    color: var(--pbi-primary);
+    background: rgba(11, 70, 40, 0.05);
+}
+.pbi-pagination .page-numbers.current {
+    background: var(--pbi-primary) !important;
+    border-color: var(--pbi-primary) !important;
+    color: #ffffff !important;
+}
+.pbi-pagination .page-numbers.dots {
+    border-color: transparent;
+    background: transparent;
+    cursor: default;
+}
+

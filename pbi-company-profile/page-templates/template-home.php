@@ -384,9 +384,9 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
 
             if ($directory_query->have_posts()) :
                 while ($directory_query->have_posts()) : $directory_query->the_post();
-                    $biz_owner = get_post_meta(get_the_ID(), '_pbi_biz_owner', true);
-                    $biz_phone = get_post_meta(get_the_ID(), '_pbi_biz_phone', true);
-                    $biz_website = get_post_meta(get_the_ID(), '_pbi_biz_website', true);
+                    $biz_owner = get_post_meta(get_the_ID(), '_pbi_business_owner', true);
+                    $biz_phone = get_post_meta(get_the_ID(), '_pbi_business_wa', true);
+                    $biz_website = get_post_meta(get_the_ID(), '_pbi_business_website', true);
             ?>
                     <div class="pbi-card pbi-card--interactive" style="padding: 24px; display:flex; flex-direction:column; gap:12px;">
                         <?php if (has_post_thumbnail()) : ?>
