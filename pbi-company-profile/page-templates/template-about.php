@@ -10,7 +10,9 @@ defined('ABSPATH') || exit;
 get_header();
 
 // Fetch settings from Customizer
-$about_video = get_theme_mod('pbi_about_video', '<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>');
+$about_video  = get_theme_mod('pbi_about_video', '<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>');
+$founder_name = get_theme_mod('pbi_about_founder_name', 'Ust. Arif Abu Syamil');
+$board_name   = get_theme_mod('pbi_about_board_name', 'Bpk. Arif Hastono');
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
@@ -131,9 +133,9 @@ $about_video = get_theme_mod('pbi_about_video', '<iframe width="560" height="315
                     <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; margin-bottom: 20px; border: 4px solid rgba(212,175,55,0.2); background: #f1f5f9; display: flex; align-items: center; justify-content: center;">
                         <i class="fa-solid fa-user-tie" style="font-size: 55px; color: #94a3b8;"></i>
                     </div>
-                    <h3 style="margin: 0; font-size: 18px; color: var(--pbi-primary); line-height: 1.3;">Ustadz H. Samsul Arifin, SBC</h3>
+                    <h3 style="margin: 0; font-size: 18px; color: var(--pbi-primary); line-height: 1.3;"><?php echo esc_html($founder_name); ?></h3>
                     <p style="font-size: 12px; font-weight: 700; color: var(--pbi-accent); margin: 6px 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px;">Founder & Guru Utama PBI</p>
-                    <p style="font-size: 13.5px; color: #64748b; line-height: 1.65; margin: 0;">Inisiator utama and perintis gerakan pelatihan dakwah wirausaha Pesantren Bisnis Indonesia secara nasional.</p>
+                    <p style="font-size: 13.5px; color: #64748b; line-height: 1.65; margin: 0;">Inisiator utama dan perintis gerakan pelatihan dakwah wirausaha Pesantren Bisnis Indonesia secara nasional.</p>
                 </div>
 
                 <!-- Pengurus Card 1 -->
@@ -141,7 +143,7 @@ $about_video = get_theme_mod('pbi_about_video', '<iframe width="560" height="315
                     <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; margin-bottom: 20px; border: 4px solid rgba(11,70,40,0.1); background: #f1f5f9; display: flex; align-items: center; justify-content: center;">
                         <i class="fa-solid fa-user" style="font-size: 55px; color: #94a3b8;"></i>
                     </div>
-                    <h3 style="margin: 0; font-size: 18px; color: var(--pbi-primary); line-height: 1.3;">Dewan Pengurus Pusat</h3>
+                    <h3 style="margin: 0; font-size: 18px; color: var(--pbi-primary); line-height: 1.3;"><?php echo esc_html($board_name); ?></h3>
                     <p style="font-size: 12px; font-weight: 700; color: var(--pbi-accent); margin: 6px 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px;">Pengurus Inti PBI</p>
                     <p style="font-size: 13.5px; color: #64748b; line-height: 1.65; margin: 0;">Mengelola kegiatan operasional harian, koordinasi daerah, dan pelaksanaan program-program dakwah PBI pusat.</p>
                 </div>

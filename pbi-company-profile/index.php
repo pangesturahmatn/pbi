@@ -11,7 +11,7 @@ get_header();
 <div class="pbi-page-header" style="background: linear-gradient(135deg, var(--pbi-primary), var(--pbi-charcoal)); padding: 60px 0; color: #fff; text-align: center; position: relative; overflow: hidden;">
     <div class="pbi-container" style="position: relative; z-index: 2;">
         <h1 class="pbi-page-header__title" style="color: #ffffff; margin: 0 0 10px 0; font-size: 36px; font-weight: 700;"><?php single_post_title(); ?></h1>
-        <p class="pbi-page-header__desc" style="color: rgba(255,255,255,0.85); font-size: 16px; margin: 0;">Kabar, Berita Terbaru & Artikel Bermanfaat Dari PBI</p>
+        <p class="pbi-page-header__desc" style="color: rgba(255,255,255,0.85); font-size: 16px; margin: 0;"><?php echo esc_html(get_theme_mod('pbi_blog_subtitle', 'Kabar, Berita Terbaru & Artikel Bermanfaat Dari PBI')); ?></p>
     </div>
     <div style="position: absolute; top: -50%; left: -20%; width: 60%; height: 200%; background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, rgba(0,0,0,0) 70%); z-index: 1;"></div>
 </div>

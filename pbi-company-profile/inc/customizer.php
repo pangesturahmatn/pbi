@@ -276,6 +276,46 @@ if (!function_exists('pbi_customize_register')) {
             'section'     => 'pbi_about_section',
             'type'        => 'textarea',
         ));
+
+        // Founder Name
+        $wp_customize->add_setting('pbi_about_founder_name', array(
+            'default'           => 'Ust. Arif Abu Syamil',
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+        $wp_customize->add_control('pbi_about_founder_name', array(
+            'label'    => __('Nama Pendiri (Founder)', 'pbi-theme'),
+            'section'  => 'pbi_about_section',
+            'type'     => 'text',
+        ));
+
+        // Board Name
+        $wp_customize->add_setting('pbi_about_board_name', array(
+            'default'           => 'Bpk. Arif Hastono',
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+        $wp_customize->add_control('pbi_about_board_name', array(
+            'label'    => __('Nama Pengurus Inti', 'pbi-theme'),
+            'section'  => 'pbi_about_section',
+            'type'     => 'text',
+        ));
+
+        // 7. Section: Pengaturan Halaman Blog
+        $wp_customize->add_section('pbi_blog_section', array(
+            'title'       => __('Pengaturan Halaman Blog', 'pbi-theme'),
+            'priority'    => 36,
+            'description' => __('Atur sub-judul banner untuk Halaman Blog.', 'pbi-theme'),
+        ));
+
+        // Blog Subtitle
+        $wp_customize->add_setting('pbi_blog_subtitle', array(
+            'default'           => 'Kabar, Berita Terbaru & Artikel Bermanfaat Dari PBI',
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+        $wp_customize->add_control('pbi_blog_subtitle', array(
+            'label'    => __('Sub-judul Banner Blog', 'pbi-theme'),
+            'section'  => 'pbi_blog_section',
+            'type'     => 'text',
+        ));
     }
 }
 add_action('customize_register', 'pbi_customize_register');
