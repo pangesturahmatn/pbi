@@ -7,11 +7,22 @@ defined('ABSPATH') || exit;
 
 get_header();
 
-$primary = get_theme_mod('pbi_primary_color', '#0B4628');
-$accent  = get_theme_mod('pbi_accent_color', '#D4AF37');
+$theme_colors = pbi_get_rest_theme_colors();
+$primary = $theme_colors['primary'];
+$accent  = $theme_colors['accent'];
+
+// Dynamic dark background for gradient to match the theme color
+$dark_bg = '#052414'; // default dark emerald
+if (strcasecmp($primary, '#9B1C1C') === 0) {
+    $dark_bg = '#1c0303'; // dark maroon
+} elseif (strcasecmp($primary, '#1E3A8A') === 0) {
+    $dark_bg = '#030b24'; // dark blue
+} elseif (strcasecmp($primary, '#0F766E') === 0) {
+    $dark_bg = '#031f1c'; // dark teal
+}
 ?>
 
-<div class="pbi-masuk-anggota-hero" style="background: linear-gradient(135deg, <?php echo esc_attr($primary); ?> 0%, #052414 100%); padding: 100px 0 80px; color: #ffffff; position: relative; overflow: hidden;">
+<div class="pbi-masuk-anggota-hero" style="background: linear-gradient(135deg, <?php echo esc_attr($primary); ?> 0%, <?php echo esc_attr($dark_bg); ?> 100%); padding: 100px 0 80px; color: #ffffff; position: relative; overflow: hidden;">
     <!-- Decorative Glows -->
     <div style="position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
     <div style="position: absolute; bottom: -50px; left: -50px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
