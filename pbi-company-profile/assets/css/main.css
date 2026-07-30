@@ -6,6 +6,7 @@
     /* Color Tokens (Will be partially overridden by Customizer dynamic styles) */
     --pbi-primary: #0B4628;
     --pbi-primary-hover: #072e1a;
+    --pbi-primary-dark: #072e1a;
     --pbi-accent: #D4AF37;
     --pbi-accent-glow: rgba(212, 175, 55, 0.25);
     --pbi-charcoal: #1E293B;
@@ -153,7 +154,7 @@ img {
 
 .pbi-btn--accent {
     background: var(--pbi-gold-metallic);
-    color: #072e1a !important;
+    color: var(--pbi-primary-dark) !important;
     border: none;
     font-weight: 700;
     box-shadow: 0 4px 15px rgba(186, 140, 48, 0.25);
@@ -164,7 +165,7 @@ img {
 
 .pbi-btn--accent:hover {
     background: var(--pbi-gold-metallic-hover);
-    color: #072e1a !important;
+    color: var(--pbi-primary-dark) !important;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(186, 140, 48, 0.4);
 }
@@ -393,7 +394,7 @@ body.admin-bar .pbi-header {
 /* Hero Section */
 .pbi-hero {
     position: relative;
-    background: linear-gradient(135deg, var(--pbi-primary), #072e1a);
+    background: linear-gradient(135deg, var(--pbi-primary), var(--pbi-primary-dark));
     padding: 180px 0 100px 0;
     color: #FFFFFF;
     overflow: hidden;
@@ -562,7 +563,7 @@ body.admin-bar .pbi-header {
 
 /* Footer layout */
 .pbi-footer {
-    background-color: #072e1a;
+    background-color: var(--pbi-primary-dark);
     color: rgba(255, 255, 255, 0.75);
     padding: 80px 0 0 0;
     position: relative;
@@ -692,7 +693,7 @@ body.admin-bar .pbi-header {
 
 /* Helper CTA block custom style */
 .pbi-cta-block {
-    background: linear-gradient(135deg, var(--pbi-primary), #072e1a);
+    background: linear-gradient(135deg, var(--pbi-primary), var(--pbi-primary-dark));
     color: #FFFFFF;
     border-radius: 12px;
     padding: 40px;

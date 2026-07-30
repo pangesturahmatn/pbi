@@ -367,6 +367,7 @@ if (!function_exists('pbi_customize_css')) {
             :root {
                 --pbi-primary: <?php echo esc_html($primary); ?>;
                 --pbi-primary-hover: <?php echo esc_html(adjust_brightness($primary, -20)); ?>;
+                --pbi-primary-dark: <?php echo esc_html(adjust_brightness($primary, -45)); ?>;
                 --pbi-accent: <?php echo esc_html($accent); ?>;
                 --pbi-accent-glow: rgba(<?php echo esc_html(hex2rgb($accent)); ?>, 0.25);
             }
