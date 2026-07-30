@@ -53,6 +53,10 @@ $whatsapp = get_theme_mod('pbi_social_whatsapp', '6281334537381');
                         <div style="margin-bottom: 40px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.03);">
                             <?php the_post_thumbnail('large', array('style' => 'width: 100%; height: auto; display: block;')); ?>
                         </div>
+                    <?php else : ?>
+                        <div style="margin-bottom: 40px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.03); background: #ffffff; display: flex; align-items: center; justify-content: center; height: 320px; border: 1px solid #e2e8f0; padding: 30px;">
+                            <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/logo.png'); ?>" alt="<?php the_title_attribute(); ?>" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                        </div>
                     <?php endif; ?>
 
                     <div class="pbi-entry-content" style="font-size: 16.5px; line-height: 1.8; color: var(--pbi-charcoal);">

@@ -1047,6 +1047,7 @@ body.admin-bar .pbi-header {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
     transition: all 0.2s ease;
 }
 
@@ -1069,6 +1070,7 @@ body.admin-bar .pbi-header {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
     transition: all 0.2s ease;
     box-shadow: 0 4px 12px rgba(186, 140, 48, 0.2);
 }
@@ -1093,6 +1095,7 @@ body.admin-bar .pbi-header {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
     cursor: not-allowed !important;
     pointer-events: none;
 }

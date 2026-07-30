@@ -341,7 +341,11 @@ $upcoming_query = new WP_Query($upcoming_args);
                             <td style="padding: 14px 20px; font-weight: 600; color: #64748b;"><?php echo $no++; ?></td>
                             <td style="padding: 14px 20px; font-weight: 700; color: var(--pbi-primary);"><?php echo esc_html($year); ?></td>
                             <td style="padding: 14px 20px;">
-                                <div style="font-weight: 700; color: #1e293b;"><?php the_title(); ?></div>
+                                <div style="font-weight: 700;">
+                                    <a href="<?php the_permalink(); ?>" style="color: #1e293b; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--pbi-primary)'" onmouseout="this.style.color='#1e293b'">
+                                        <?php the_title(); ?>
+                                    </a>
+                                </div>
                                 <div style="font-size: 12px; color: #94a3b8; margin-top: 2px;"><i class="fa-solid fa-clock-rotate-left"></i> <?php echo esc_html($display_date); ?></div>
                             </td>
                             <td style="padding: 14px 20px; color: #475569; font-weight: 500;">

@@ -23,8 +23,12 @@ get_header();
         
         <!-- Left: Blog Posts Area -->
         <div class="pbi-blog-main">
-            <div class="pbi-blog-posts" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px;">
-                <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
+            <div class="pbi-blog-posts" style="display: flex; flex-direction: column; gap: 28px;">
+                <?php 
+                $post_counter = 0;
+                if (have_posts()) : while (have_posts()) : the_post(); 
+                    $post_counter++;
+                ?>
                     <article id="post-<?php the_ID(); ?>" <?php post_class('pbi-blog-card'); ?> style="background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
                         
                         <!-- Featured Image / Placeholder Cover -->
@@ -93,9 +97,24 @@ get_header();
                         </div>
 
                     </article>
+                    <?php 
+                    // Insert Advertisement slot after the 2nd post
+                    if ($post_counter === 2) : 
+                    ?>
+                        <div class="pbi-ad-banner" style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 14px; padding: 25px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 120px; box-shadow: 0 4px 15px rgba(0,0,0,0.01); transition: all 0.3s ease; position: relative; overflow: hidden; margin: 10px 0;">
+                            <div style="position: absolute; top: 0; right: 0; background: #64748b; color: #fff; font-size: 8px; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-bottom-left-radius: 6px;">Sponsor</div>
+                            <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--pbi-accent); display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                                <i class="fa-solid fa-rectangle-ad" style="font-size: 14px;"></i> Ruang Iklan / Kemitraan PBI
+                            </span>
+                            <p style="margin: 0; font-size: 13.5px; color: #64748b; max-width: 480px; line-height: 1.5;">Tempatkan banner promosi unit usaha alumni PBI atau kode Google AdSense Anda di sini untuk menjangkau ribuan pengunjung.</p>
+                            <a href="<?php echo esc_url(home_url('/hubungi-kami/')); ?>" style="margin-top: 10px; font-size: 12px; font-weight: 700; color: var(--pbi-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                Pasang Iklan Anda <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    <?php endif; ?>
                 <?php endwhile; ?>
                 <?php else : ?>
-                    <p style="grid-column: 1/-1; text-align: center; padding: 50px 0; color: #64748b; font-size: 16px;"><?php esc_html_e('Maaf, tidak ada artikel berita ditemukan.', 'pbi-theme'); ?></p>
+                    <p style="text-align: center; padding: 50px 0; color: #64748b; font-size: 16px;"><?php esc_html_e('Maaf, tidak ada artikel berita ditemukan.', 'pbi-theme'); ?></p>
                 <?php endif; ?>
             </div>
 
@@ -174,6 +193,28 @@ get_header();
 @media (min-width: 992px) {
     .pbi-blog-layout {
         grid-template-columns: 2.7fr 1fr;
+    }
+}
+
+/* Portal berita style cards */
+.pbi-blog-card {
+    display: flex;
+    flex-direction: column;
+}
+@media (min-width: 768px) {
+    .pbi-blog-card {
+        flex-direction: row !important;
+        align-items: stretch;
+    }
+    .pbi-blog-card__thumbnail {
+        width: 260px !important;
+        height: auto !important;
+        min-height: 220px;
+        flex-shrink: 0;
+    }
+    .pbi-blog-card__body {
+        flex-grow: 1;
+        padding: 24px 28px !important;
     }
 }
 
