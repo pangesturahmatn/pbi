@@ -213,6 +213,23 @@ foreach ($files_mapping as $item) {
         continue;
     }
 
+    // Cek apakah baris pertama valid sebagai header kolom (mengandung kata kunci umum)
+    $first_row_str = implode(' ', array_map('strtolower', $rows[0]));
+    $is_header_valid = false;
+    $header_keywords = array("nama", "member", "whatsapp", "wa", "hp", "phone", "kontak", "korda", "kota", "kabupaten", "provinsi");
+    foreach ($header_keywords as $keyword) {
+        if (strpos($first_row_str, $keyword) !== false) {
+            $is_header_valid = true;
+            break;
+        }
+    }
+
+    // Jika baris pertama dideteksi sebagai judul banner (bukan header), geser ke baris berikutnya
+    if (!$is_header_valid && count($rows) > 1) {
+        echo "[INFO] Baris pertama dilewati karena dideteksi sebagai judul banner.\n";
+        array_shift($rows); // Buang baris judul
+    }
+
     // Ambil header
     $headers = array_map(function($h) {
         return trim(strtolower($h));
@@ -233,14 +250,28 @@ foreach ($files_mapping as $item) {
     };
 
     // Cari index kolom
-    $idx_name     = $get_idx(array("nama lengkap", "nama"));
-    $idx_wa       = $get_idx(array("whatsapp", "no whatsapp", "no. hp", "phone", "kontak", "nomer hp"));
-    $idx_korda    = $get_idx(array("kota / kabupaten", "kabupaten", "kota"));
+    $idx_name     = $get_idx(array("nama lengkap", "nama member", "nama"));
+    $idx_wa       = $get_idx(array("whatsapp", "no whatsapp", "no. hp", "phone", "kontak", "nomer hp", "no wa", "wa"));
+    $idx_korda    = $get_idx(array("kota / kabupaten", "kabupaten", "kota", "korda"));
     $idx_provinsi = $get_idx(array("propinsi", "provinsi"));
     $idx_alamat   = $get_idx(array("alamat jalan", "alamat lengkap", "alamat rumah"));
     $idx_biz_name = $get_idx(array("nama bisnis", "nama usaha", "nama perusahaan"));
     $idx_biz_field= $get_idx(array("bidang bisnis", "bidang usaha"));
     $idx_gender   = $get_idx(array("jenis kelamin", "kelamin", "gender", "l/p", "sex"));
+
+    // Fallback Auto-Detect Kolom WhatsApp jika tidak terdeteksi via nama header
+    if ($idx_wa === -1 && count($rows) > 0) {
+        $first_row = $rows[0];
+        foreach ($first_row as $idx => $val) {
+            $val_clean = preg_replace('/\D/', '', $val);
+            // Jika kolom berisi angka saja dengan panjang nomor telepon (10-15 digit)
+            if (strlen($val_clean) >= 10 && strlen($val_clean) <= 15) {
+                $idx_wa = $idx;
+                echo "[INFO] Auto-detect kolom WhatsApp berada di indeks ke-{$idx}\n";
+                break;
+            }
+        }
+    }
 
     $success_count = 0;
     $update_count  = 0;

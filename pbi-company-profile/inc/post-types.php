@@ -889,7 +889,13 @@ add_action('manage_pbi_registration_posts_custom_column', 'pbi_reg_admin_custom_
 function pbi_reg_admin_custom_column_content($column, $post_id) {
     switch ($column) {
         case 'wa':
-            echo esc_html(get_post_meta($post_id, '_pbi_reg_wa', true));
+            $wa = get_post_meta($post_id, '_pbi_reg_wa', true);
+            $wa_alt = get_post_meta($post_id, '_pbi_reg_wa_alt', true);
+            if (!empty($wa_alt)) {
+                echo esc_html($wa) . '<br><span style="color: #64748b; font-size: 11px; display: inline-block; margin-top: 2px;">Alt: ' . esc_html($wa_alt) . '</span>';
+            } else {
+                echo esc_html($wa);
+            }
             break;
         case 'gender':
             $gender = get_post_meta($post_id, '_pbi_reg_gender', true);
@@ -967,7 +973,7 @@ function pbi_registration_stats_page_callback() {
         // Add UTF-8 BOM for Excel formatting compatibility
         fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
-        fputcsv($output, array('Nama Lengkap', 'WhatsApp', 'Korda', 'Provinsi', 'Alamat Lengkap', 'Nama Usaha', 'Bidang Usaha', 'Event / Batch', 'Jenis Kelamin', 'Status'));
+        fputcsv($output, array('Nama Lengkap', 'WhatsApp 1', 'WhatsApp 2 (Alternatif)', 'Korda', 'Provinsi', 'Alamat Lengkap', 'Nama Usaha', 'Bidang Usaha', 'Event / Batch', 'Jenis Kelamin', 'Status'));
 
         $results = $wpdb->get_results("
             SELECT p.ID, p.post_title 
@@ -978,6 +984,7 @@ function pbi_registration_stats_page_callback() {
 
         foreach ($results as $post) {
             $wa = get_post_meta($post->ID, '_pbi_reg_wa', true);
+            $wa_alt = get_post_meta($post->ID, '_pbi_reg_wa_alt', true);
             $korda = get_post_meta($post->ID, '_pbi_reg_korda', true);
             $provinsi = get_post_meta($post->ID, '_pbi_reg_provinsi', true);
             $alamat = get_post_meta($post->ID, '_pbi_reg_alamat', true);
@@ -987,7 +994,7 @@ function pbi_registration_stats_page_callback() {
             $gender = get_post_meta($post->ID, '_pbi_reg_gender', true) ?: '-';
             $status = get_post_meta($post->ID, '_pbi_reg_status', true) ?: 'PENDING';
 
-            fputcsv($output, array($post->post_title, $wa, $korda, $provinsi, $alamat, $nama_usaha, $bidang_usaha, $event, $gender, $status));
+            fputcsv($output, array($post->post_title, $wa, $wa_alt, $korda, $provinsi, $alamat, $nama_usaha, $bidang_usaha, $event, $gender, $status));
         }
 
         fclose($output);
@@ -1237,6 +1244,133 @@ function pbi_registration_stats_page_callback() {
         });
     </script>
     <?php
+}
+
+// =====================================================================
+// 11. ADMIN CUSTOM META SEARCH & DROPDOWN FILTERING
+// =====================================================================
+
+// Perluas Pencarian Bawaan Admin WordPress agar mencakup Post Meta (Korda, Provinsi, WA, Bisnis, Event)
+add_action('pre_get_posts', 'pbi_reg_admin_search_meta');
+function pbi_reg_admin_search_meta($query) {
+    if (!is_admin() || !$query->is_main_query() || $query->get('post_type') !== 'pbi_registration') {
+        return;
+    }
+
+    $search_term = $query->get('s');
+    if (empty($search_term)) {
+        return;
+    }
+
+    global $wpdb;
+
+    // Cari post ID yang memiliki meta value yang cocok dengan keyword pencarian
+    $meta_search_like = '%' . $wpdb->esc_like($search_term) . '%';
+    $matching_post_ids = $wpdb->get_col($wpdb->prepare("
+        SELECT DISTINCT post_id 
+        FROM {$wpdb->postmeta} 
+        WHERE (meta_key IN ('_pbi_reg_wa', '_pbi_reg_wa_alt', '_pbi_reg_korda', '_pbi_reg_provinsi', '_pbi_reg_nama_usaha', '_pbi_reg_event'))
+          AND meta_value LIKE %s
+    ", $meta_search_like));
+
+    if (!empty($matching_post_ids)) {
+        // Gabungkan pencarian judul (Nama) dan pencarian metadata
+        $query->set('post__in', $matching_post_ids);
+        
+        // PENTING: Kosongkan pencarian default ('s') agar SQL default WordPress tidak membatasi hasil pencarian,
+        // namun pendaftar yang namanya mirip search_term juga bisa tercakup secara logis.
+        $query->set('s', '');
+        
+        // Simpan search query di parameter kustom untuk keperluan UI textbox pencarian
+        $query->set('pbi_search_term', $search_term);
+    }
+}
+
+// Kembalikan teks pencarian ke dalam textbox search box admin WordPress
+add_filter('get_search_query', 'pbi_reg_restore_search_query');
+function pbi_reg_restore_search_query($query) {
+    global $pagenow;
+    if (is_admin() && $pagenow === 'edit.php' && isset($_GET['post_type']) && $_GET['post_type'] === 'pbi_registration') {
+        if (isset($_GET['s']) && !empty($_GET['s'])) {
+            return $_GET['s'];
+        }
+    }
+    return $query;
+}
+
+// Tambahkan Dropdown Filter Event/Batch dan Provinsi di atas tabel admin list
+add_action('restrict_manage_posts', 'pbi_reg_admin_filters');
+function pbi_reg_admin_filters($post_type) {
+    if ($post_type !== 'pbi_registration') {
+        return;
+    }
+
+    global $wpdb;
+
+    // 1. Dropdown Filter Event / Batch
+    $events = $wpdb->get_col("
+        SELECT DISTINCT meta_value 
+        FROM {$wpdb->postmeta} 
+        WHERE meta_key = '_pbi_reg_event' AND meta_value != ''
+        ORDER BY meta_value ASC
+    ");
+    $selected_event = isset($_GET['pbi_filter_event']) ? $_GET['pbi_filter_event'] : '';
+    echo '<select name="pbi_filter_event">';
+    echo '<option value="">Semua Angkatan / Batch</option>';
+    foreach ($events as $event) {
+        printf('<option value="%s" %s>%s</option>', esc_attr($event), selected($selected_event, $event, false), esc_html($event));
+    }
+    echo '</select>';
+
+    // 2. Dropdown Filter Provinsi
+    $provinces = $wpdb->get_col("
+        SELECT DISTINCT meta_value 
+        FROM {$wpdb->postmeta} 
+        WHERE meta_key = '_pbi_reg_provinsi' AND meta_value != '' AND meta_value != '-'
+        ORDER BY meta_value ASC
+    ");
+    $selected_prov = isset($_GET['pbi_filter_prov']) ? $_GET['pbi_filter_prov'] : '';
+    echo '<select name="pbi_filter_prov">';
+    echo '<option value="">Semua Provinsi</option>';
+    foreach ($provinces as $prov) {
+        $label = ucwords(strtolower(trim($prov)));
+        printf('<option value="%s" %s>%s</option>', esc_attr($prov), selected($selected_prov, $prov, false), esc_html($label));
+    }
+    echo '</select>';
+}
+
+// Terapkan Filter Dropdown tersebut ke Query WordPress saat memuat halaman admin list
+add_filter('parse_query', 'pbi_reg_admin_filter_query');
+function pbi_reg_admin_filter_query($query) {
+    global $pagenow;
+    if (!is_admin() || $pagenow !== 'edit.php' || !$query->is_main_query() || $query->get('post_type') !== 'pbi_registration') {
+        return;
+    }
+
+    $meta_query = array();
+
+    if (isset($_GET['pbi_filter_event']) && $_GET['pbi_filter_event'] !== '') {
+        $meta_query[] = array(
+            'key'   => '_pbi_reg_event',
+            'value' => $_GET['pbi_filter_event'],
+            'compare' => '='
+        );
+    }
+
+    if (isset($_GET['pbi_filter_prov']) && $_GET['pbi_filter_prov'] !== '') {
+        $meta_query[] = array(
+            'key'   => '_pbi_reg_provinsi',
+            'value' => $_GET['pbi_filter_prov'],
+            'compare' => '='
+        );
+    }
+
+    if (!empty($meta_query)) {
+        if (count($meta_query) > 1) {
+            $meta_query['relation'] = 'AND';
+        }
+        $query->set('meta_query', $meta_query);
+    }
 }
 
 
