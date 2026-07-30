@@ -309,13 +309,19 @@ foreach ($files_mapping as $item) {
 
     foreach ($rows as $r) {
         $raw_wa = isset($r[$idx_wa]) ? $r[$idx_wa] : '';
+        $nama = isset($r[$idx_name]) ? trim($r[$idx_name]) : '';
+        if (empty($nama)) {
+            $nama = 'Tanpa Nama';
+        }
         
         // Memproses & Memisahkan WhatsApp Utama dan Alternatif
         list($wa1, $wa2) = process_whatsapp_numbers($raw_wa);
 
-        if (empty($wa1)) {
+        // Jika tidak ada nomor WA, dan namanya juga kosong/tanpa nama, barulah kita skip.
+        // Ini memungkinkan data pendaftar tanpa nomor telepon tetap ter-impor secara aman.
+        if (empty($wa1) && $nama === 'Tanpa Nama') {
             $skip_count++;
-            continue; // Skip jika tidak ada WA utama yang valid
+            continue;
         }
 
         // 1. Ambil & Standarkan Jenis Kelamin (Gender)
@@ -328,36 +334,54 @@ foreach ($files_mapping as $item) {
             $gender_clean = 'Perempuan';
         }
 
-        // Cek duplikasi di WordPress: Cari post pbi_registration dengan WhatsApp 1 & Event yang sama
-        $query = new WP_Query(array(
-            'post_type'  => 'pbi_registration',
-            'meta_query' => array(
-                'relation' => 'AND',
-                array(
-                    'key'     => '_pbi_reg_wa',
-                    'value'   => $wa1,
-                    'compare' => '='
-                ),
-                array(
-                    'key'     => '_pbi_reg_event',
-                    'value'   => $item['event'],
-                    'compare' => '='
-                )
-            ),
-            'posts_per_page' => 1,
-            'fields'         => 'ids'
-        ));
-
         $post_id = 0;
         $is_update = false;
+
+        // Cek duplikasi di WordPress dengan aman (mendukung status 'any' karena post_type pbi_registration ber-status 'private')
+        if (!empty($wa1)) {
+            // Jika ada WhatsApp, cari berdasarkan WhatsApp & Event
+            $query = new WP_Query(array(
+                'post_type'   => 'pbi_registration',
+                'post_status' => 'any',
+                'meta_query'  => array(
+                    'relation' => 'AND',
+                    array(
+                        'key'     => '_pbi_reg_wa',
+                        'value'   => $wa1,
+                        'compare' => '='
+                    ),
+                    array(
+                        'key'     => '_pbi_reg_event',
+                        'value'   => $item['event'],
+                        'compare' => '='
+                    )
+                ),
+                'posts_per_page' => 1,
+                'fields'         => 'ids'
+            ));
+        } else {
+            // Jika WhatsApp kosong, cari berdasarkan Nama (post_title) & Event
+            $query = new WP_Query(array(
+                'post_type'   => 'pbi_registration',
+                'post_status' => 'any',
+                'title'       => $nama,
+                'meta_query'  => array(
+                    array(
+                        'key'     => '_pbi_reg_event',
+                        'value'   => $item['event'],
+                        'compare' => '='
+                    )
+                ),
+                'posts_per_page' => 1,
+                'fields'         => 'ids'
+            ));
+        }
 
         if ($query->have_posts()) {
             $post_ids = $query->posts;
             $post_id = $post_ids[0];
             $is_update = true;
         } else {
-            // Ekstrak detail data
-            $nama = isset($r[$idx_name]) ? trim($r[$idx_name]) : 'Tanpa Nama';
             // Buat Post CPT pbi_registration baru
             $post_id = wp_insert_post(array(
                 'post_title'   => $nama,
@@ -401,7 +425,7 @@ foreach ($files_mapping as $item) {
         }
     }
 
-    echo "[INFO] Selesai: {$success_count} baru disimpan, {$update_count} data lama dilengkapi, {$skip_count} dilewati (tidak ada WA).\n";
+    echo "[INFO] Selesai: {$success_count} baru disimpan, {$update_count} data lama dilengkapi, {$skip_count} dilewati (tidak ada nama & WA).\n";
 }
 
 echo "\n=== PROSES IMPOR & UPDATE SELESAI ===\n";
