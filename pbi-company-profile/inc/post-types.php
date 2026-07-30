@@ -149,6 +149,66 @@ if (!function_exists('pbi_register_business_taxonomy')) {
 }
 add_action('init', 'pbi_register_business_taxonomy');
 
+// Register Business Korda Taxonomy
+if (!function_exists('pbi_register_business_korda_taxonomy')) {
+    function pbi_register_business_korda_taxonomy() {
+        $labels = array(
+            'name'              => _x('Korda / Wilayah', 'taxonomy general name', 'pbi-theme'),
+            'singular_name'     => _x('Korda / Wilayah', 'taxonomy singular name', 'pbi-theme'),
+            'search_items'      => __('Cari Korda / Wilayah', 'pbi-theme'),
+            'all_items'         => __('Semua Korda / Wilayah', 'pbi-theme'),
+            'edit_item'         => __('Edit Korda / Wilayah', 'pbi-theme'),
+            'update_item'       => __('Perbarui Korda / Wilayah', 'pbi-theme'),
+            'add_new_item'      => __('Tambah Korda Baru', 'pbi-theme'),
+            'new_item_name'     => __('Nama Korda Baru', 'pbi-theme'),
+            'menu_name'         => __('Korda / Wilayah', 'pbi-theme'),
+        );
+
+        $args = array(
+            'hierarchical'      => true,
+            'labels'            => $labels,
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => array('slug' => 'business-korda'),
+            'show_in_rest'      => true,
+        );
+
+        register_taxonomy('business_korda', array('pbi_directory'), $args);
+    }
+}
+add_action('init', 'pbi_register_business_korda_taxonomy');
+
+// Register Business Event Taxonomy
+if (!function_exists('pbi_register_business_event_taxonomy')) {
+    function pbi_register_business_event_taxonomy() {
+        $labels = array(
+            'name'              => _x('Event Alumni', 'taxonomy general name', 'pbi-theme'),
+            'singular_name'     => _x('Event Alumni', 'taxonomy singular name', 'pbi-theme'),
+            'search_items'      => __('Cari Event Alumni', 'pbi-theme'),
+            'all_items'         => __('Semua Event Alumni', 'pbi-theme'),
+            'edit_item'         => __('Edit Event Alumni', 'pbi-theme'),
+            'update_item'       => __('Perbarui Event Alumni', 'pbi-theme'),
+            'add_new_item'      => __('Tambah Event Alumni Baru', 'pbi-theme'),
+            'new_item_name'     => __('Nama Event Alumni Baru', 'pbi-theme'),
+            'menu_name'         => __('Event Alumni', 'pbi-theme'),
+        );
+
+        $args = array(
+            'hierarchical'      => true,
+            'labels'            => $labels,
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => array('slug' => 'business-event'),
+            'show_in_rest'      => true,
+        );
+
+        register_taxonomy('business_event', array('pbi_directory'), $args);
+    }
+}
+add_action('init', 'pbi_register_business_event_taxonomy');
+
 // =====================================================================
 // 3. REGISTER CUSTOM META BOXES (INPUT FIELDS IN EDITOR PANEL)
 //    Membantu user memasukkan tanggal, waktu, lokasi, dan kontak
@@ -433,6 +493,36 @@ add_action('rest_api_init', function () {
         },
         'schema' => array(
             'description' => 'Plain text description of the business CPT',
+            'type'        => 'string',
+        ),
+    ));
+
+    // Register business_korda names field
+    register_rest_field('pbi_directory', 'korda_name', array(
+        'get_callback' => function ($post_arr) {
+            $terms = wp_get_object_terms($post_arr['id'], 'business_korda');
+            if (!is_wp_error($terms) && !empty($terms)) {
+                return $terms[0]->name;
+            }
+            return '';
+        },
+        'schema' => array(
+            'description' => 'Nama Korda / Wilayah Alumni',
+            'type'        => 'string',
+        ),
+    ));
+
+    // Register business_event names field
+    register_rest_field('pbi_directory', 'event_name', array(
+        'get_callback' => function ($post_arr) {
+            $terms = wp_get_object_terms($post_arr['id'], 'business_event');
+            if (!is_wp_error($terms) && !empty($terms)) {
+                return $terms[0]->name;
+            }
+            return '';
+        },
+        'schema' => array(
+            'description' => 'Nama Event Alumni PBI',
             'type'        => 'string',
         ),
     ));
