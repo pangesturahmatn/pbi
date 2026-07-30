@@ -638,5 +638,53 @@ if (!function_exists('pbi_directory_populate_custom_columns')) {
     }
 }
 
+// =====================================================================
+// 5. RESTRICT ACCESS TO DIRECTORIES FOR MEMBERS ONLY (LOGGED IN)
+// =====================================================================
+
+add_action('template_redirect', 'pbi_restrict_directory_access');
+if (!function_exists('pbi_restrict_directory_access')) {
+    function pbi_restrict_directory_access() {
+        if (is_singular('pbi_directory') || is_post_type_archive('pbi_directory') || is_tax('business_cat') || is_tax('business_korda') || is_tax('business_event')) {
+            if (!is_user_logged_in()) {
+                auth_redirect();
+            }
+        }
+    }
+}
+
+// =====================================================================
+// 6. INCLUDE DIREKTORI BISNIS IN TAXONOMY ARCHIVES
+// =====================================================================
+
+add_action('pre_get_posts', 'pbi_modify_archive_query');
+if (!function_exists('pbi_modify_archive_query')) {
+    function pbi_modify_archive_query($query) {
+        if (!is_admin() && $query->is_main_query()) {
+            if (is_tax('business_korda') || is_tax('business_event') || is_tax('business_cat')) {
+                $query->set('post_type', array('pbi_directory'));
+            }
+        }
+    }
+}
+
+// =====================================================================
+// 7. AUTO-FLUSH REWRITE RULES ON NEW CUSTOM TAXONOMIES REGISTER
+// =====================================================================
+
+add_action('init', 'pbi_flush_rules_on_new_register', 99);
+if (!function_exists('pbi_flush_rules_on_new_register')) {
+    function pbi_flush_rules_on_new_register() {
+        if (get_transient('pbi_flush_rewrite_rules_v5')) {
+            flush_rewrite_rules(false);
+            delete_transient('pbi_flush_rewrite_rules_v5');
+        }
+    }
+}
+if (false === get_transient('pbi_flush_rewrite_rules_v5')) {
+    set_transient('pbi_flush_rewrite_rules_v5', true, 3600);
+}
+
+
 
 
