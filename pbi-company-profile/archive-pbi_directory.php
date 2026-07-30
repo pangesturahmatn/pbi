@@ -9,7 +9,7 @@ get_header();
 ?>
 
 <!-- === HERO BANNER === -->
-<div class="pbi-dir-hero" style="background: linear-gradient(135deg, var(--pbi-primary) 0%, #07301b 100%); padding: 80px 0 0; color: #fff; text-align: center; position: relative; overflow: hidden;">
+<div class="pbi-dir-hero" style="background: linear-gradient(135deg, var(--pbi-primary) 0%, #07301b 100%); padding: 130px 0 0; color: #fff; text-align: center; position: relative; overflow: hidden;">
     <!-- Decorative circles -->
     <div style="position: absolute; top: -80px; right: -80px; width: 350px; height: 350px; background: radial-gradient(circle, rgba(212,175,55,0.18) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
     <div style="position: absolute; bottom: 0; left: -60px; width: 250px; height: 250px; background: radial-gradient(circle, rgba(212,175,55,0.12) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>

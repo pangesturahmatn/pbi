@@ -864,6 +864,382 @@ if (!function_exists('pbi_create_masuk_anggota_page')) {
     }
 }
 
+// =====================================================================
+// 9. CUSTOM COLUMNS FOR PBI REGISTRATION ADMIN TABLE
+// =====================================================================
+add_filter('manage_pbi_registration_posts_columns', 'pbi_reg_admin_columns');
+function pbi_reg_admin_columns($columns) {
+    $new_columns = array();
+    foreach ($columns as $key => $title) {
+        $new_columns[$key] = $title;
+        if ($key === 'title') {
+            $new_columns['wa'] = 'WhatsApp';
+            $new_columns['gender'] = 'L/P';
+            $new_columns['korda'] = 'Korda';
+            $new_columns['provinsi'] = 'Provinsi';
+            $new_columns['nama_usaha'] = 'Nama Usaha';
+            $new_columns['event'] = 'Event / Batch';
+            $new_columns['status'] = 'Status';
+        }
+    }
+    return $new_columns;
+}
+
+add_action('manage_pbi_registration_posts_custom_column', 'pbi_reg_admin_custom_column_content', 10, 2);
+function pbi_reg_admin_custom_column_content($column, $post_id) {
+    switch ($column) {
+        case 'wa':
+            echo esc_html(get_post_meta($post_id, '_pbi_reg_wa', true));
+            break;
+        case 'gender':
+            $gender = get_post_meta($post_id, '_pbi_reg_gender', true);
+            if ($gender === 'Laki-laki') {
+                echo '<span style="background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10px;">Laki-laki</span>';
+            } elseif ($gender === 'Perempuan') {
+                echo '<span style="background: #fce7f3; color: #be185d; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10px;">Perempuan</span>';
+            } else {
+                echo '<span style="color: #94a3b8;">-</span>';
+            }
+            break;
+        case 'korda':
+            echo esc_html(get_post_meta($post_id, '_pbi_reg_korda', true) ?: '-');
+            break;
+        case 'provinsi':
+            echo esc_html(get_post_meta($post_id, '_pbi_reg_provinsi', true) ?: '-');
+            break;
+        case 'nama_usaha':
+            echo esc_html(get_post_meta($post_id, '_pbi_reg_nama_usaha', true) ?: '-');
+            break;
+        case 'event':
+            echo esc_html(get_post_meta($post_id, '_pbi_reg_event', true) ?: '-');
+            break;
+        case 'status':
+            $status = get_post_meta($post_id, '_pbi_reg_status', true) ?: 'PENDING';
+            $bg = '#f1f5f9'; $fg = '#475569';
+            if ($status === 'LOLOS') { $bg = '#dcfce7'; $fg = '#15803d'; }
+            echo '<span style="background: ' . $bg . '; color: ' . $fg . '; padding: 3px 10px; border-radius: 12px; font-weight: bold; font-size: 10px; text-transform: uppercase;">' . esc_html($status) . '</span>';
+            break;
+    }
+}
+
+// Enable Sorting for Custom Columns
+add_filter('manage_edit-pbi_registration_sortable_columns', 'pbi_reg_sortable_columns');
+function pbi_reg_sortable_columns($columns) {
+    $columns['wa'] = 'wa';
+    $columns['gender'] = 'gender';
+    $columns['korda'] = 'korda';
+    $columns['provinsi'] = 'provinsi';
+    $columns['event'] = 'event';
+    return $columns;
+}
+
+// =====================================================================
+// 10. ADMIN DASHBOARD STATS & CSV EXPORT
+// =====================================================================
+add_action('admin_menu', 'pbi_register_stats_submenu');
+function pbi_register_stats_submenu() {
+    add_submenu_page(
+        'edit.php?post_type=pbi_registration',
+        'Statistik & Ekspor Pendaftar PBI',
+        'Statistik & Ekspor',
+        'manage_options',
+        'pbi_registration_stats',
+        'pbi_registration_stats_page_callback'
+    );
+}
+
+function pbi_registration_stats_page_callback() {
+    global $wpdb;
+
+    // --- HANDLE DOWNLOAD CSV ---
+    if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
+        if (!current_user_can('manage_options')) {
+            wp_die('Akses ditolak.');
+        }
+
+        // Clean buffer
+        if (ob_get_length()) ob_clean();
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename=pendaftar-pbi-export-' . date('Y-m-d') . '.csv');
+
+        $output = fopen('php://output', 'w');
+        // Add UTF-8 BOM for Excel formatting compatibility
+        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+
+        fputcsv($output, array('Nama Lengkap', 'WhatsApp', 'Korda', 'Provinsi', 'Alamat Lengkap', 'Nama Usaha', 'Bidang Usaha', 'Event / Batch', 'Jenis Kelamin', 'Status'));
+
+        $results = $wpdb->get_results("
+            SELECT p.ID, p.post_title 
+            FROM {$wpdb->posts} p 
+            WHERE p.post_type = 'pbi_registration' AND p.post_status = 'private'
+            ORDER BY p.ID DESC
+        ");
+
+        foreach ($results as $post) {
+            $wa = get_post_meta($post->ID, '_pbi_reg_wa', true);
+            $korda = get_post_meta($post->ID, '_pbi_reg_korda', true);
+            $provinsi = get_post_meta($post->ID, '_pbi_reg_provinsi', true);
+            $alamat = get_post_meta($post->ID, '_pbi_reg_alamat', true);
+            $nama_usaha = get_post_meta($post->ID, '_pbi_reg_nama_usaha', true);
+            $bidang_usaha = get_post_meta($post->ID, '_pbi_reg_bidang_usaha', true);
+            $event = get_post_meta($post->ID, '_pbi_reg_event', true);
+            $gender = get_post_meta($post->ID, '_pbi_reg_gender', true) ?: '-';
+            $status = get_post_meta($post->ID, '_pbi_reg_status', true) ?: 'PENDING';
+
+            fputcsv($output, array($post->post_title, $wa, $korda, $provinsi, $alamat, $nama_usaha, $bidang_usaha, $event, $gender, $status));
+        }
+
+        fclose($output);
+        exit;
+    }
+
+    // --- QUERY STATISTICS DATA ---
+    // 1. Total Pendaftar
+    $total_count = $wpdb->get_var("
+        SELECT COUNT(p.ID) 
+        FROM {$wpdb->posts} p 
+        WHERE p.post_type = 'pbi_registration' AND p.post_status = 'private'
+    ");
+
+    // 2. Gender Statistics
+    $gender_stats = $wpdb->get_results("
+        SELECT pm.meta_value as gender, COUNT(pm.post_id) as count 
+        FROM {$wpdb->postmeta} pm
+        JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+        WHERE p.post_type = 'pbi_registration' AND p.post_status = 'private' AND pm.meta_key = '_pbi_reg_gender'
+        GROUP BY pm.meta_value
+    ");
+    $genders = array('Laki-laki' => 0, 'Perempuan' => 0, 'Tidak Diketahui' => 0);
+    foreach ($gender_stats as $gs) {
+        $g = $gs->gender ?: 'Tidak Diketahui';
+        $genders[$g] = intval($gs->count);
+    }
+
+    // 3. Batch / Event Statistics
+    $event_stats = $wpdb->get_results("
+        SELECT pm.meta_value as event, COUNT(pm.post_id) as count 
+        FROM {$wpdb->postmeta} pm
+        JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+        WHERE p.post_type = 'pbi_registration' AND p.post_status = 'private' AND pm.meta_key = '_pbi_reg_event'
+        GROUP BY pm.meta_value
+        ORDER BY count DESC
+    ");
+
+    // 4. Top 10 Provinces
+    $prov_stats = $wpdb->get_results("
+        SELECT pm.meta_value as provinsi, COUNT(pm.post_id) as count 
+        FROM {$wpdb->postmeta} pm
+        JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+        WHERE p.post_type = 'pbi_registration' AND p.post_status = 'private' AND pm.meta_key = '_pbi_reg_provinsi'
+        GROUP BY pm.meta_value
+        ORDER BY count DESC
+        LIMIT 10
+    ");
+
+    // --- RENDER DASHBOARD HTML ---
+    ?>
+    <div class="wrap" style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 1200px; margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 20px 30px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <div>
+                <h1 style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span class="dashicons dashicons-chart-pie" style="font-size: 28px; width:28px; height:28px; color: #10b981;"></span>
+                    Dashboard Analitik & Ekspor Pendaftar
+                </h1>
+                <p style="margin: 5px 0 0; color: #64748b; font-size: 13px;">Kelola, analisis, dan ekspor database pendaftaran wirausahawan Muslim PBI.</p>
+            </div>
+            <div>
+                <a href="<?php echo esc_url(admin_url('edit.php?post_type=pbi_registration&page=pbi_registration_stats&action=export_csv')); ?>" 
+                   class="button button-primary button-large" 
+                   style="background: #10b981; border-color: #10b981; font-weight: bold; border-radius: 6px; padding: 4px 20px 5px; height: auto; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);">
+                    <span class="dashicons dashicons-download" style="margin-top: 4px; margin-right: 4px;"></span> Unduh CSV (Blasting)
+                </a>
+            </div>
+        </div>
+
+        <!-- KPI Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px;">
+            <div style="background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="font-size: 13px; font-weight: bold; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Total Pendaftar Terarsip</div>
+                <div style="font-size: 38px; font-weight: 900; color: #0f172a; margin: 10px 0 5px;"><?php echo number_format($total_count, 0, ',', '.'); ?></div>
+                <div style="font-size: 11px; color: #10b981; font-weight: bold;">Seluruh Angkatan & Batch</div>
+            </div>
+            <div style="background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="font-size: 13px; font-weight: bold; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Pendaftar Laki-laki</div>
+                <div style="font-size: 38px; font-weight: 900; color: #0284c7; margin: 10px 0 5px;"><?php echo number_format($genders['Laki-laki'], 0, ',', '.'); ?></div>
+                <div style="font-size: 11px; color: #0284c7; font-weight: bold;">
+                    <?php echo $total_count ? round(($genders['Laki-laki'] / $total_count) * 100, 1) : 0; ?>% dari total
+                </div>
+            </div>
+            <div style="background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="font-size: 13px; font-weight: bold; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Pendaftar Perempuan</div>
+                <div style="font-size: 38px; font-weight: 900; color: #db2777; margin: 10px 0 5px;"><?php echo number_format($genders['Perempuan'], 0, ',', '.'); ?></div>
+                <div style="font-size: 11px; color: #db2777; font-weight: bold;">
+                    <?php echo $total_count ? round(($genders['Perempuan'] / $total_count) * 100, 1) : 0; ?>% dari total
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 25px; margin-bottom: 25px;">
+            <!-- Doughnut Chart (Gender) -->
+            <div style="background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <h3 style="margin: 0 0 20px; font-size: 15px; font-weight: 800; color: #0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">Proporsi Jenis Kelamin</h3>
+                <div style="position: relative; height:280px; width:100%;">
+                    <canvas id="genderChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Bar Chart (Batch/Event) -->
+            <div style="background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <h3 style="margin: 0 0 20px; font-size: 15px; font-weight: 800; color: #0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">Distribusi Pendaftar per Batch (Top 10)</h3>
+                <div style="position: relative; height:280px; width:100%;">
+                    <canvas id="batchChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+            <!-- Top Provinces -->
+            <div style="background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <h3 style="margin: 0 0 20px; font-size: 15px; font-weight: 800; color: #0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">10 Provinsi Asal Terbanyak</h3>
+                <div style="position: relative; height:300px; width:100%;">
+                    <canvas id="provinceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Detail Batch Table -->
+            <div style="background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <h3 style="margin: 0 0 15px; font-size: 15px; font-weight: 800; color: #0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">Tabel Data per Angkatan (Rincian Lengkap)</h3>
+                <div style="max-height: 290px; overflow-y: auto;">
+                    <table class="wp-list-table widefat fixed striped" style="border: none; box-shadow: none;">
+                        <thead>
+                            <tr>
+                                <th style="font-weight: bold; width: 70%;">Nama Event / Angkatan</th>
+                                <th style="font-weight: bold; text-align: right; width: 30%;">Jumlah Pendaftar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($event_stats as $es) : ?>
+                                <tr>
+                                    <td style="font-weight: 600; color: #334155;"><?php echo esc_html($es->event ?: 'Tanpa Event'); ?></td>
+                                    <td style="font-weight: bold; text-align: right; color: #10b981;"><?php echo number_format(intval($es->count), 0, ',', '.'); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ChartJS Library and Activation Script -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Gender Chart
+            const ctxGender = document.getElementById('genderChart').getContext('2d');
+            new Chart(ctxGender, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Laki-laki', 'Perempuan', 'Belum Diisi'],
+                    datasets: [{
+                        data: [
+                            <?php echo $genders['Laki-laki']; ?>, 
+                            <?php echo $genders['Perempuan']; ?>, 
+                            <?php echo $genders['Tidak Diketahui']; ?>
+                        ],
+                        backgroundColor: ['#0284c7', '#db2777', '#94a3b8'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { weight: 'bold', size: 11 } } }
+                    }
+                }
+            });
+
+            // 2. Batch Chart (Top 10)
+            <?php
+            $top_events = array_slice($event_stats, 0, 10);
+            $event_labels = array();
+            $event_counts = array();
+            foreach ($top_events as $te) {
+                // Shorten labels
+                $lbl = str_replace('Basic Training (BT) ', 'BT ', $te->event);
+                $event_labels[] = $lbl;
+                $event_counts[] = intval($te->count);
+            }
+            ?>
+            const ctxBatch = document.getElementById('batchChart').getContext('2d');
+            new Chart(ctxBatch, {
+                type: 'bar',
+                data: {
+                    labels: <?php echo json_encode($event_labels); ?>,
+                    datasets: [{
+                        label: 'Jumlah Pendaftar',
+                        data: <?php echo json_encode($event_counts); ?>,
+                        backgroundColor: '#10b981',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 9 } } }
+                    }
+                }
+            });
+
+            // 3. Province Chart (Top 10)
+            <?php
+            $prov_labels = array();
+            $prov_counts = array();
+            foreach ($prov_stats as $ps) {
+                $lbl = trim($ps->provinsi ?: 'Lain-lain');
+                // Standardize casing
+                $lbl = ucwords(strtolower($lbl));
+                if (empty($lbl) || $lbl === '-') $lbl = 'Lain-lain';
+                $prov_labels[] = $lbl;
+                $prov_counts[] = intval($ps->count);
+            }
+            ?>
+            const ctxProv = document.getElementById('provinceChart').getContext('2d');
+            new Chart(ctxProv, {
+                type: 'bar',
+                data: {
+                    labels: <?php echo json_encode($prov_labels); ?>,
+                    datasets: [{
+                        label: 'Pendaftar',
+                        data: <?php echo json_encode($prov_counts); ?>,
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        y: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 10 } } }
+                    }
+                }
+            });
+        });
+    </script>
+    <?php
+}
+
+
 
 
 

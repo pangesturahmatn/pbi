@@ -24,7 +24,7 @@ $whatsapp = get_theme_mod('pbi_social_whatsapp', '6281334537381');
     <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
         
         <!-- Page Title Banner -->
-        <div class="pbi-page-header" style="background: linear-gradient(135deg, var(--pbi-primary), var(--pbi-charcoal)); padding: 80px 0; color: #ffffff; text-align: center; position: relative;">
+        <div class="pbi-page-header" style="background: linear-gradient(135deg, var(--pbi-primary), var(--pbi-charcoal)); padding: 130px 0 80px; color: #ffffff; text-align: center; position: relative;">
             <div class="pbi-container" style="max-width: 800px; position: relative; z-index: 2;">
                 <!-- Category badge -->
                 <?php
