@@ -22,7 +22,7 @@ if (strcasecmp($primary, '#9B1C1C') === 0) {
 }
 ?>
 
-<div class="pbi-masuk-anggota-hero" style="background: linear-gradient(135deg, <?php echo esc_attr($primary); ?> 0%, <?php echo esc_attr($dark_bg); ?> 100%); padding: 100px 0 80px; color: #ffffff; position: relative; overflow: hidden;">
+<div class="pbi-masuk-anggota-hero" style="background: linear-gradient(135deg, <?php echo esc_attr($primary); ?> 0%, <?php echo esc_attr($dark_bg); ?> 100%); padding: 140px 0 80px; color: #ffffff; position: relative; overflow: hidden;">
     <!-- Decorative Glows -->
     <div style="position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
     <div style="position: absolute; bottom: -50px; left: -50px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
@@ -32,7 +32,7 @@ if (strcasecmp($primary, '#9B1C1C') === 0) {
         <!-- Left Side: App Pitch -->
         <div style="flex: 1; min-width: 320px;">
             <span style="background: <?php echo esc_attr($accent); ?>; color: #fff; padding: 5px 16px; font-size: 11px; font-weight: 700; border-radius: 20px; text-transform: uppercase; letter-spacing: 1.5px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(212,175,55,0.3);">
-                <i class="fa-solid fa-mobile-screen-button"></i> PBI Mobile App (Flutter)
+                <i class="fa-solid fa-mobile-screen-button"></i> PBI Mobile App
             </span>
             <h1 style="color: #ffffff; margin: 0 0 15px; font-size: 36px; font-weight: 800; line-height: 1.3;">
                 Akses Komunitas PBI<br>Dalam Genggaman Anda
@@ -84,7 +84,7 @@ if (strcasecmp($primary, '#9B1C1C') === 0) {
                 </a>
             </div>
             
-            <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin: 0;">*Aplikasi mobile PBI dikembangkan menggunakan Flutter Framework.</p>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin: 0;">*Aplikasi mobile PBI resmi untuk anggota.</p>
         </div>
 
         <!-- Right Side: Web Login Card -->

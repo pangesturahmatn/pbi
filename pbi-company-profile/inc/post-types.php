@@ -651,17 +651,12 @@ if (!function_exists('pbi_restrict_directory_access')) {
             exit;
         }
 
-        // Restrict access to logged-in members for all directory views (including search results)
-        if (
-            is_singular('pbi_directory') || 
-            is_post_type_archive('pbi_directory') || 
-            is_tax('business_cat') || 
-            is_tax('business_korda') || 
-            is_tax('business_event') ||
-            (is_search() && (get_query_var('post_type') === 'pbi_directory' || (isset($_GET['post_type']) && $_GET['post_type'] === 'pbi_directory')))
-        ) {
+        // Hanya batasi akses halaman detail bisnis (singular) secara ketat untuk user yang belum login
+        if (is_singular('pbi_directory')) {
             if (!is_user_logged_in()) {
-                auth_redirect();
+                // Arahkan ke halaman masuk-anggota agar mereka mendapat info pendaftaran & link login
+                wp_redirect(home_url('/masuk-anggota/?redirect_to=' . urlencode(get_permalink())));
+                exit;
             }
         }
     }
