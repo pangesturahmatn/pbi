@@ -3,3 +3,9 @@ deploy.ps1
 Thumbs.db
 .DS_Store
 *.log
+*.csv
+*.xlsx
+*.zip
+*.sql
+*.dump
+temp_extract/
