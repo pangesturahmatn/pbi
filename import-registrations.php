@@ -67,6 +67,55 @@ function clean_phone($val) {
     return $digits;
 }
 
+// Belah nomor HP yang digabung tanpa pemisah
+function split_merged_phone($val) {
+    $digits = preg_replace('/\D/', '', $val);
+    if (strlen($digits) >= 20) {
+        for ($pos = 10; $pos <= 14; $pos++) {
+            if ($pos < strlen($digits) - 8) {
+                $sub = substr($digits, $pos);
+                if (strpos($sub, '08') === 0 || strpos($sub, '628') === 0) {
+                    $part1 = substr($digits, 0, $pos);
+                    $part2 = $sub;
+                    return array($part1, $part2);
+                }
+            }
+        }
+    }
+    return array($val, '');
+}
+
+// Proses pemisahan nomor WhatsApp 1 dan 2
+function process_whatsapp_numbers($val) {
+    if (empty($val)) return array('', '');
+    $val_clean = trim($val);
+
+    if (preg_match('/[\/,\;&]|dan|atau/i', $val_clean)) {
+        $cleaned_val = preg_replace('/[\/,\;&]|dan|atau/i', ',', $val_clean);
+        $parts = explode(',', $cleaned_val);
+        $p1 = clean_phone($parts[0]);
+        $p2 = isset($parts[1]) ? clean_phone($parts[1]) : '';
+        return array($p1, $p2);
+    }
+
+    $digits_only = preg_replace('/\D/', '', $val_clean);
+    if (strpos($val_clean, ' ') !== false && strlen($digits_only) >= 20) {
+        $parts = preg_split('/\s+/', $val_clean);
+        $p1 = clean_phone($parts[0]);
+        $p2 = isset($parts[1]) ? clean_phone($parts[1]) : '';
+        return array($p1, $p2);
+    }
+
+    if (strlen($digits_only) >= 20) {
+        $split = split_merged_phone($digits_only);
+        $p1 = clean_phone($split[0]);
+        $p2 = clean_phone($split[1]);
+        return array($p1, $p2);
+    }
+
+    return array(clean_phone($val_clean), '');
+}
+
 // Parser CSV yang Andal (Menangani multi-line quoted fields & escaped quotes)
 function parse_csv_file($filepath) {
     $content = file_get_contents($filepath);
@@ -199,11 +248,13 @@ foreach ($files_mapping as $item) {
 
     foreach ($rows as $r) {
         $raw_wa = isset($r[$idx_wa]) ? $r[$idx_wa] : '';
-        $wa_clean = clean_phone($raw_wa);
+        
+        // Memproses & Memisahkan WhatsApp Utama dan Alternatif
+        list($wa1, $wa2) = process_whatsapp_numbers($raw_wa);
 
-        if (empty($wa_clean)) {
+        if (empty($wa1)) {
             $skip_count++;
-            continue; // Skip jika tidak ada WA valid
+            continue; // Skip jika tidak ada WA utama yang valid
         }
 
         // 1. Ambil & Standarkan Jenis Kelamin (Gender)
@@ -216,14 +267,14 @@ foreach ($files_mapping as $item) {
             $gender_clean = 'Perempuan';
         }
 
-        // Cek duplikasi di WordPress: Cari post pbi_registration dengan WhatsApp & Event yang sama
+        // Cek duplikasi di WordPress: Cari post pbi_registration dengan WhatsApp 1 & Event yang sama
         $query = new WP_Query(array(
             'post_type'  => 'pbi_registration',
             'meta_query' => array(
                 'relation' => 'AND',
                 array(
                     'key'     => '_pbi_reg_wa',
-                    'value'   => $wa_clean,
+                    'value'   => $wa1,
                     'compare' => '='
                 ),
                 array(
@@ -268,7 +319,8 @@ foreach ($files_mapping as $item) {
             $korda_clean = trim($korda_clean);
 
             // Isi/Update metadata
-            update_post_meta($post_id, '_pbi_reg_wa', $wa_clean);
+            update_post_meta($post_id, '_pbi_reg_wa', $wa1);
+            update_post_meta($post_id, '_pbi_reg_wa_alt', $wa2); // Simpan nomor alternatif
             update_post_meta($post_id, '_pbi_reg_korda', $korda_clean);
             update_post_meta($post_id, '_pbi_reg_provinsi', $provinsi);
             update_post_meta($post_id, '_pbi_reg_alamat', $alamat);
