@@ -51,7 +51,7 @@ $mentor_query = new WP_Query($mentor_args);
                 $instagram = get_post_meta(get_the_ID(), '_pbi_mentor_instagram', true);
                 $linkedin  = get_post_meta(get_the_ID(), '_pbi_mentor_linkedin', true);
                 $youtube   = get_post_meta(get_the_ID(), '_pbi_mentor_youtube', true);
-                $image_url = has_post_thumbnail() ? get_the_post_thumbnail_url(get_the_ID(), 'medium_large') : get_template_directory_uri() . '/assets/images/default-avatar.png';
+                $image_url = has_post_thumbnail() ? get_the_post_thumbnail_url(get_the_ID(), 'medium_large') : 'https://secure.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=300&d=mp';
             ?>
                 <div class="pbi-mentor-card" style="background: #ffffff; border: 1px solid #e8edf5; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.02); text-align: center;">
                     <!-- Mentor Avatar & Hover Zoom -->
