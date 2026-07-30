@@ -342,6 +342,20 @@ if (!function_exists('pbi_render_directory_meta_box')) {
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_business_wa">No. WhatsApp Bisnis *</label>
                 <input type="text" id="pbi_business_wa" name="pbi_business_wa" value="<?php echo esc_attr($wa); ?>" placeholder="Contoh: 6281334537381 (Gunakan awalan 62 tanpa spasi/tanda hubung)" style="width: 100%; padding: 8px; font-size: 14px;" required />
+                <?php if (!empty($wa)) : 
+                    $clean_wa = preg_replace('/[^0-9]/', '', $wa);
+                    $message = sprintf(
+                        "Assalamualaikum %s, kami dari Admin PBI ingin mengonfirmasi apakah nomor WhatsApp ini masih aktif dan apakah Anda masih siap bergabung di Direktori Bisnis PBI?",
+                        $owner
+                    );
+                    $wa_url = 'https://wa.me/' . $clean_wa . '?text=' . rawurlencode($message);
+                ?>
+                    <p style="margin: 8px 0 0 0;">
+                        <a href="<?php echo esc_url($wa_url); ?>" class="button button-secondary" target="_blank" style="background-color: #25D366; color: #fff; border-color: #128C7E; text-shadow: none; display: inline-flex; align-items: center; gap: 4px; padding: 0 10px; height: 28px; line-height: 26px;">
+                            <span class="dashicons dashicons-whatsapp" style="font-size: 16px; width: 16px; height: 16px; margin-top: 3px; color: white;"></span> Hubungi Owner (Cek Keaktifan)
+                        </a>
+                    </p>
+                <?php endif; ?>
             </div>
 
             <div style="margin-bottom: 15px;">
@@ -560,5 +574,69 @@ if (!function_exists('pbi_get_rest_theme_colors')) {
         );
     }
 }
+
+// =====================================================================
+// 4. REGISTER ADMIN COLUMNS FOR DIREKTORI BISNIS
+// =====================================================================
+
+add_filter('manage_pbi_directory_posts_columns', 'pbi_directory_set_custom_columns');
+if (!function_exists('pbi_directory_set_custom_columns')) {
+    function pbi_directory_set_custom_columns($columns) {
+        $new_columns = array();
+        foreach ($columns as $key => $title) {
+            $new_columns[$key] = $title;
+            if ($key === 'title') {
+                $new_columns['business_owner'] = __('Pemilik Usaha', 'pbi-theme');
+                $new_columns['business_wa']    = __('No. WA', 'pbi-theme');
+                $new_columns['korda']          = __('Korda / Wilayah', 'pbi-theme');
+                $new_columns['wa_action']      = __('Aksi Japri WA', 'pbi-theme');
+            }
+        }
+        return $new_columns;
+    }
+}
+
+add_action('manage_pbi_directory_posts_custom_column', 'pbi_directory_populate_custom_columns', 10, 2);
+if (!function_exists('pbi_directory_populate_custom_columns')) {
+    function pbi_directory_populate_custom_columns($column, $post_id) {
+        switch ($column) {
+            case 'business_owner':
+                $owner = get_post_meta($post_id, '_pbi_business_owner', true);
+                echo esc_html($owner ? $owner : '-');
+                break;
+                
+            case 'business_wa':
+                $wa = get_post_meta($post_id, '_pbi_business_wa', true);
+                echo esc_html($wa ? $wa : '-');
+                break;
+                
+            case 'korda':
+                $terms = wp_get_post_terms($post_id, 'business_korda');
+                if (!is_wp_error($terms) && !empty($terms)) {
+                    echo esc_html($terms[0]->name);
+                } else {
+                    echo '-';
+                }
+                break;
+                
+            case 'wa_action':
+                $wa = get_post_meta($post_id, '_pbi_business_wa', true);
+                $owner = get_post_meta($post_id, '_pbi_business_owner', true);
+                if (!empty($wa)) {
+                    $clean_wa = preg_replace('/[^0-9]/', '', $wa);
+                    $message = sprintf(
+                        "Assalamualaikum %s, kami dari Admin PBI ingin mengonfirmasi apakah nomor WhatsApp ini masih aktif dan apakah Anda masih siap bergabung di Direktori Bisnis PBI?",
+                        $owner
+                    );
+                    $wa_url = 'https://wa.me/' . $clean_wa . '?text=' . rawurlencode($message);
+                    echo '<a href="' . esc_url($wa_url) . '" class="button button-small" target="_blank" style="background-color: #25D366; color: #fff; border-color: #128C7E; display: inline-flex; align-items: center; gap: 4px;"><span class="dashicons dashicons-whatsapp" style="font-size: 15px; width:15px; height:15px; margin-top:2px; color:white;"></span> Japri WA</a>';
+                } else {
+                    echo '-';
+                }
+                break;
+        }
+    }
+}
+
 
 
