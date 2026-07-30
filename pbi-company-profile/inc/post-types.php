@@ -699,6 +699,28 @@ if (false === get_transient('pbi_flush_rewrite_rules_v5')) {
     set_transient('pbi_flush_rewrite_rules_v5', true, 3600);
 }
 
+// =====================================================================
+// 8. PROGRAMMATICALLY CREATE "MASUK ANGGOTA" PAGE IF NOT EXISTS
+// =====================================================================
+
+add_action('init', 'pbi_create_masuk_anggota_page');
+if (!function_exists('pbi_create_masuk_anggota_page')) {
+    function pbi_create_masuk_anggota_page() {
+        $slug = 'masuk-anggota';
+        $page = get_page_by_path($slug);
+        if (!$page) {
+            wp_insert_post(array(
+                'post_title'    => 'Masuk Anggota',
+                'post_name'     => $slug,
+                'post_status'   => 'publish',
+                'post_type'     => 'page',
+                'post_content'  => '', // Handled by page-masuk-anggota.php template
+            ));
+        }
+    }
+}
+
+
 
 
 
