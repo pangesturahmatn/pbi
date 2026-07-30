@@ -211,6 +211,19 @@ if (!is_dir($downloads_dir)) {
     $downloads_dir = "C:\\Users\\pange\\Downloads";
 }
 
+// Dapatkan ID user administrator pertama sebagai default author untuk CPT private
+$admin_id = 1;
+global $wpdb;
+$found_admin_id = $wpdb->get_var("
+    SELECT ID FROM {$wpdb->users} u
+    JOIN {$wpdb->usermeta} um ON u.ID = um.user_id
+    WHERE um.meta_key = 'wp_capabilities' AND um.meta_value LIKE '%administrator%'
+    LIMIT 1
+");
+if ($found_admin_id) {
+    $admin_id = (int)$found_admin_id;
+}
+
 echo "=== MEMULAI PROSES IMPOR & UPDATE DATA PENDAFTAR GOOGLE FORM ===\n";
 if (!$is_cli) {
     echo "<pre>";
@@ -219,8 +232,14 @@ if (!$is_cli) {
 foreach ($files_mapping as $item) {
     $csv_path = $downloads_dir . DIRECTORY_SEPARATOR . $item['file'];
     if (!file_exists($csv_path)) {
-        echo "[SKIP] File tidak ditemukan: {$item['file']}\n";
-        continue;
+        // Coba cari di subfolder "sudah masuk csv nya" jika secara lokal berada di subfolder
+        $alt_path = $downloads_dir . DIRECTORY_SEPARATOR . 'sudah masuk csv nya' . DIRECTORY_SEPARATOR . $item['file'];
+        if (file_exists($alt_path)) {
+            $csv_path = $alt_path;
+        } else {
+            echo "[SKIP] File tidak ditemukan: {$item['file']}\n";
+            continue;
+        }
     }
 
     echo "\n[PROSES] Membaca file: {$item['file']}...\n";
@@ -387,6 +406,7 @@ foreach ($files_mapping as $item) {
                 'post_title'   => $nama,
                 'post_type'    => 'pbi_registration',
                 'post_status'  => 'private',
+                'post_author'  => $admin_id,
             ));
             $is_update = false;
         }
