@@ -31,7 +31,7 @@ if (!function_exists('pbi_register_theme_shortcodes')) {
                 $current_user = wp_get_current_user();
                 return '<a href="' . esc_url(wp_logout_url(home_url())) . '" class="pbi-btn pbi-btn--accent"><i class="fa-solid fa-right-from-bracket"></i> Keluar (' . esc_html($current_user->display_name) . ')</a>';
             } else {
-                return '<a href="' . esc_url(wp_login_url()) . '" class="pbi-btn pbi-btn--primary"><i class="fa-solid fa-user-lock"></i> Masuk Anggota</a>';
+                return '<a href="' . esc_url(home_url('/masuk-anggota')) . '" class="pbi-btn pbi-btn--primary"><i class="fa-solid fa-user-lock"></i> Masuk Anggota</a>';
             }
         });
 

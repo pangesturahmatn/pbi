@@ -77,6 +77,7 @@ get_header();
             $business_wa      = get_post_meta(get_the_ID(), '_pbi_business_wa', true);
             $business_address = get_post_meta(get_the_ID(), '_pbi_business_address', true);
             $business_owner   = get_post_meta(get_the_ID(), '_pbi_business_owner', true);
+            $business_price   = get_post_meta(get_the_ID(), '_pbi_business_price', true);
         ?>
             <article id="post-<?php the_ID(); ?>" <?php post_class(); ?> style="background: #ffffff; border: 1px solid #e8edf5; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; box-shadow: 0 2px 12px rgba(0,0,0,0.03);">
                 
@@ -117,9 +118,16 @@ get_header();
                         </span>
                     <?php endif; ?>
 
-                    <h3 style="margin: 0; font-size: 19px; font-weight: 700; line-height: 1.35;">
-                        <a href="<?php the_permalink(); ?>" style="color: #1e293b; text-decoration: none;"><?php the_title(); ?></a>
-                    </h3>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                        <h3 style="margin: 0; font-size: 19px; font-weight: 700; line-height: 1.35; flex: 1;">
+                            <a href="<?php the_permalink(); ?>" style="color: #1e293b; text-decoration: none;"><?php the_title(); ?></a>
+                        </h3>
+                        <?php if ($business_price) : ?>
+                            <span style="font-size: 12.5px; font-weight: 700; color: #d97706; white-space: nowrap; margin-top: 3px;">
+                                <i class="fa-solid fa-tags"></i> <?php echo esc_html($business_price); ?>
+                            </span>
+                        <?php endif; ?>
+                    </div>
                     
                     <?php if ($business_address) : ?>
                         <span style="font-size: 13px; color: #64748b; display: flex; align-items: center; gap: 5px;">

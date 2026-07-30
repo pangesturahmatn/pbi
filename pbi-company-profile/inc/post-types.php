@@ -256,11 +256,15 @@ if (!function_exists('pbi_render_directory_meta_box')) {
     function pbi_render_directory_meta_box($post) {
         wp_nonce_field('pbi_save_directory_meta_nonce', 'pbi_directory_meta_nonce');
 
-        $owner   = get_post_meta($post->ID, '_pbi_business_owner', true);
-        $address = get_post_meta($post->ID, '_pbi_business_address', true);
-        $wa      = get_post_meta($post->ID, '_pbi_business_wa', true);
-        $email   = get_post_meta($post->ID, '_pbi_business_email', true);
-        $website = get_post_meta($post->ID, '_pbi_business_website', true);
+        $owner     = get_post_meta($post->ID, '_pbi_business_owner', true);
+        $address   = get_post_meta($post->ID, '_pbi_business_address', true);
+        $wa        = get_post_meta($post->ID, '_pbi_business_wa', true);
+        $email     = get_post_meta($post->ID, '_pbi_business_email', true);
+        $website   = get_post_meta($post->ID, '_pbi_business_website', true);
+        $shopee    = get_post_meta($post->ID, '_pbi_business_shopee', true);
+        $tokopedia = get_post_meta($post->ID, '_pbi_business_tokopedia', true);
+        $maps      = get_post_meta($post->ID, '_pbi_business_maps', true);
+        $price     = get_post_meta($post->ID, '_pbi_business_price', true);
         ?>
         <div class="pbi-meta-wrapper" style="padding: 10px 0;">
             <p style="margin-bottom: 15px; color: #64748b; font-style: italic;">Lengkapi profil usaha anggota di bawah ini agar terjalin kolaborasi dan jaringan perdagangan nasional yang profesional.</p>
@@ -287,7 +291,27 @@ if (!function_exists('pbi_render_directory_meta_box')) {
 
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_business_website">Website Usaha (Jika Ada)</label>
-                <input type="url" id="pbi_business_website" name="pbi_business_website" value="<?php echo esc_attr($website); ?>" placeholder="Contoh: https://bisnissaya.com" style="width: 100%; padding: 8px; font-size: 14px;" />
+                <input type="url" id="pbi_business_website" name="pbi_business_website" value="<?php echo esc_url($website); ?>" placeholder="Contoh: https://bisnissaya.com" style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_business_shopee">Toko Shopee (URL) - Opsional</label>
+                <input type="url" id="pbi_business_shopee" name="pbi_business_shopee" value="<?php echo esc_url($shopee); ?>" placeholder="Contoh: https://shopee.co.id/tokosejahtera" style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_business_tokopedia">Toko Tokopedia (URL) - Opsional</label>
+                <input type="url" id="pbi_business_tokopedia" name="pbi_business_tokopedia" value="<?php echo esc_url($tokopedia); ?>" placeholder="Contoh: https://tokopedia.com/tokosejahtera" style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_business_maps">Google Maps Lokasi Usaha (URL) - Opsional</label>
+                <input type="url" id="pbi_business_maps" name="pbi_business_maps" value="<?php echo esc_url($maps); ?>" placeholder="Contoh: https://maps.google.com/?q=..." style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_business_price">Kisaran Harga Produk/Jasa - Opsional</label>
+                <input type="text" id="pbi_business_price" name="pbi_business_price" value="<?php echo esc_attr($price); ?>" placeholder="Contoh: Rp 50.000 - Rp 200.000" style="width: 100%; padding: 8px; font-size: 14px;" />
             </div>
         </div>
         <?php
@@ -352,8 +376,99 @@ if (!function_exists('pbi_save_custom_meta_boxes_data')) {
             if (isset($_POST['pbi_business_website'])) {
                 update_post_meta($post_id, '_pbi_business_website', esc_url_raw($_POST['pbi_business_website']));
             }
+            if (isset($_POST['pbi_business_shopee'])) {
+                update_post_meta($post_id, '_pbi_business_shopee', esc_url_raw($_POST['pbi_business_shopee']));
+            }
+            if (isset($_POST['pbi_business_tokopedia'])) {
+                update_post_meta($post_id, '_pbi_business_tokopedia', esc_url_raw($_POST['pbi_business_tokopedia']));
+            }
+            if (isset($_POST['pbi_business_maps'])) {
+                update_post_meta($post_id, '_pbi_business_maps', esc_url_raw($_POST['pbi_business_maps']));
+            }
+            if (isset($_POST['pbi_business_price'])) {
+                update_post_meta($post_id, '_pbi_business_price', sanitize_text_field($_POST['pbi_business_price']));
+            }
         }
     }
 }
 add_action('save_post', 'pbi_save_custom_meta_boxes_data');
+
+// Register REST API Custom Fields for Business Directory CPT (pbi_directory)
+add_action('rest_api_init', function () {
+    $fields = array(
+        'owner'     => '_pbi_business_owner',
+        'address'   => '_pbi_business_address',
+        'wa'        => '_pbi_business_wa',
+        'email'     => '_pbi_business_email',
+        'website'   => '_pbi_business_website',
+        'shopee'    => '_pbi_business_shopee',
+        'tokopedia' => '_pbi_business_tokopedia',
+        'maps'      => '_pbi_business_maps',
+        'price'     => '_pbi_business_price',
+    );
+
+    foreach ($fields as $field_name => $meta_key) {
+        register_rest_field('pbi_directory', $field_name, array(
+            'get_callback' => function ($post_arr) use ($meta_key) {
+                return get_post_meta($post_arr['id'], $meta_key, true);
+            },
+            'update_callback' => function ($value, $post_obj) use ($meta_key) {
+                return update_post_meta($post_obj->ID, $meta_key, $value);
+            },
+            'schema' => array(
+                'description' => $meta_key,
+                'type'        => 'string',
+            ),
+        ));
+    }
+
+    // Register plain text description field from post content
+    register_rest_field('pbi_directory', 'description', array(
+        'get_callback' => function ($post_arr) {
+            $post = get_post($post_arr['id']);
+            if ($post) {
+                return wp_strip_all_tags($post->post_content);
+            }
+            return '';
+        },
+        'schema' => array(
+            'description' => 'Plain text description of the business CPT',
+            'type'        => 'string',
+        ),
+    ));
+
+    // Register REST API Route to expose active theme colors to Flutter app
+    register_rest_route('pbi/v1', '/theme-colors', array(
+        'methods'             => 'GET',
+        'callback'            => 'pbi_get_rest_theme_colors',
+        'permission_callback' => '__return_true', // Publicly available
+    ));
+});
+
+if (!function_exists('pbi_get_rest_theme_colors')) {
+    function pbi_get_rest_theme_colors() {
+        $preset = get_theme_mod('pbi_color_preset', 'emerald_gold');
+        $preset_colors = array(
+            'maroon_gold'  => array('primary' => '#9B1C1C', 'accent' => '#D4AF37'),
+            'emerald_gold' => array('primary' => '#0B4628', 'accent' => '#D4AF37'),
+            'blue_gold'    => array('primary' => '#1E3A8A', 'accent' => '#D4AF37'),
+            'teal_gold'    => array('primary' => '#0F766E', 'accent' => '#D4AF37'),
+        );
+
+        $default_primary = isset($preset_colors[$preset]) ? $preset_colors[$preset]['primary'] : '#0B4628';
+        $default_accent  = isset($preset_colors[$preset]) ? $preset_colors[$preset]['accent'] : '#D4AF37';
+
+        $primary_mod = get_theme_mod('pbi_primary_color', '#0B4628');
+        $accent_mod  = get_theme_mod('pbi_accent_color', '#D4AF37');
+
+        $primary = ($primary_mod === '#0B4628') ? $default_primary : $primary_mod;
+        $accent  = ($accent_mod === '#D4AF37') ? $default_accent : $accent_mod;
+
+        return array(
+            'primary' => $primary,
+            'accent'  => $accent,
+        );
+    }
+}
+
 

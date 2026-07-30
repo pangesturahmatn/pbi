@@ -8,11 +8,15 @@ defined('ABSPATH') || exit;
 get_header();
 
 // Fetch specific meta details
-$business_owner   = get_post_meta(get_the_ID(), '_pbi_business_owner', true);
-$business_address = get_post_meta(get_the_ID(), '_pbi_business_address', true);
-$business_wa      = get_post_meta(get_the_ID(), '_pbi_business_wa', true);
-$business_email   = get_post_meta(get_the_ID(), '_pbi_business_email', true);
-$business_web     = get_post_meta(get_the_ID(), '_pbi_business_website', true);
+$business_owner     = get_post_meta(get_the_ID(), '_pbi_business_owner', true);
+$business_address   = get_post_meta(get_the_ID(), '_pbi_business_address', true);
+$business_wa        = get_post_meta(get_the_ID(), '_pbi_business_wa', true);
+$business_email     = get_post_meta(get_the_ID(), '_pbi_business_email', true);
+$business_web       = get_post_meta(get_the_ID(), '_pbi_business_website', true);
+$business_shopee    = get_post_meta(get_the_ID(), '_pbi_business_shopee', true);
+$business_tokopedia = get_post_meta(get_the_ID(), '_pbi_business_tokopedia', true);
+$business_maps      = get_post_meta(get_the_ID(), '_pbi_business_maps', true);
+$business_price     = get_post_meta(get_the_ID(), '_pbi_business_price', true);
 ?>
 
 <?php while (have_posts()) : the_post(); ?>
@@ -68,10 +72,22 @@ $business_web     = get_post_meta(get_the_ID(), '_pbi_business_website', true);
                             </div>
                         <?php endif; ?>
 
+                        <?php if ($business_price) : ?>
+                            <div>
+                                <span style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 600; display: block; letter-spacing: 0.5px;">Kisaran Harga</span>
+                                <strong style="font-size: 15px; color: #d97706;"><i class="fa-solid fa-tags" style="color: var(--pbi-primary); margin-right: 5px;"></i> <?php echo esc_html($business_price); ?></strong>
+                            </div>
+                        <?php endif; ?>
+
                         <?php if ($business_address) : ?>
                             <div>
                                 <span style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 600; display: block; letter-spacing: 0.5px;">Alamat Usaha</span>
-                                <span style="font-size: 14.5px; color: #475569; display: block; line-height: 1.5; margin-top: 2px;"><i class="fa-solid fa-location-dot" style="color: var(--pbi-accent); margin-right: 5px;"></i> <?php echo esc_html($business_address); ?></span>
+                                <span style="font-size: 14.5px; color: #475569; display: block; line-height: 1.5; margin-top: 2px;">
+                                    <i class="fa-solid fa-location-dot" style="color: var(--pbi-accent); margin-right: 5px;"></i> <?php echo esc_html($business_address); ?>
+                                    <?php if ($business_maps) : ?>
+                                        <br><a href="<?php echo esc_url($business_maps); ?>" target="_blank" rel="noopener" style="font-size: 12.5px; color: var(--pbi-primary); text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; margin-top: 5px;"><i class="fa-solid fa-map-location-dot"></i> Buka Google Maps</a>
+                                    <?php endif; ?>
+                                </span>
                             </div>
                         <?php endif; ?>
 
@@ -93,6 +109,22 @@ $business_web     = get_post_meta(get_the_ID(), '_pbi_business_website', true);
                             <div style="margin-top: 10px;">
                                 <a href="https://wa.me/<?php echo esc_attr(preg_replace('/[^0-9]/', '', $business_wa)); ?>?text=<?php echo rawurlencode('Assalamualaikum wr. wb., saya ingin bertanya mengenai produk/jasa dari Usaha Anda di Direktori UMKM PBI: ' . get_the_title()); ?>" target="_blank" rel="noopener" style="background: #25d366; color: #fff; text-align: center; text-decoration: none; padding: 12px 20px; border-radius: 30px; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(37,211,102,0.25); transition: all 0.3s ease;">
                                     <i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i> Hubungi via WhatsApp
+                                </a>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($business_shopee) : ?>
+                            <div style="margin-top: 10px;">
+                                <a href="<?php echo esc_url($business_shopee); ?>" target="_blank" rel="noopener" style="background: #e05638; color: #fff; text-align: center; text-decoration: none; padding: 12px 20px; border-radius: 30px; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(224,86,56,0.25); transition: all 0.3s ease;">
+                                    <i class="fa-solid fa-bag-shopping" style="font-size: 16px;"></i> Toko Shopee
+                                </a>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($business_tokopedia) : ?>
+                            <div style="margin-top: 10px;">
+                                <a href="<?php echo esc_url($business_tokopedia); ?>" target="_blank" rel="noopener" style="background: #42b549; color: #fff; text-align: center; text-decoration: none; padding: 12px 20px; border-radius: 30px; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(66,181,73,0.25); transition: all 0.3s ease;">
+                                    <i class="fa-solid fa-store" style="font-size: 16px;"></i> Tokopedia
                                 </a>
                             </div>
                         <?php endif; ?>

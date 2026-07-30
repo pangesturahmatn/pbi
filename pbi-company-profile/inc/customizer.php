@@ -16,6 +16,25 @@ if (!function_exists('pbi_customize_register')) {
             'description' => __('Kustomisasi skema warna tema kustom PBI.', 'pbi-theme'),
         ));
 
+        // Preset Color Selection
+        $wp_customize->add_setting('pbi_color_preset', array(
+            'default'           => 'emerald_gold',
+            'sanitize_callback' => 'sanitize_text_field',
+            'transport'         => 'refresh',
+        ));
+        $wp_customize->add_control('pbi_color_preset', array(
+            'label'       => __('Preset Skema Warna Utama', 'pbi-theme'),
+            'description' => __('Pilih salah satu preset warna untuk disinkronkan ke website & mobile.', 'pbi-theme'),
+            'section'     => 'pbi_design_section',
+            'type'        => 'select',
+            'choices'     => array(
+                'maroon_gold'  => 'Maroon & Emas (Merah Maroon PBI - Modern)',
+                'emerald_gold' => 'Emerald Green & Emas (Hijau PBI - Klasik)',
+                'blue_gold'    => 'Royal Blue & Emas (Biru PBI)',
+                'teal_gold'    => 'Sejuk Teal & Emas (Teal PBI)',
+            ),
+        ));
+
         // Primary Color
         $wp_customize->add_setting('pbi_primary_color', array(
             'default'           => '#0B4628',
@@ -23,7 +42,8 @@ if (!function_exists('pbi_customize_register')) {
             'transport'         => 'refresh',
         ));
         $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'pbi_primary_color', array(
-            'label'    => __('Warna Utama (Hijau Emerald)', 'pbi-theme'),
+            'label'    => __('Warna Utama Kustom', 'pbi-theme'),
+            'description' => __('Ubah jika ingin override warna utama kustom (Default: mengikuti preset).', 'pbi-theme'),
             'section'  => 'pbi_design_section',
             'settings' => 'pbi_primary_color',
         )));
@@ -35,7 +55,8 @@ if (!function_exists('pbi_customize_register')) {
             'transport'         => 'refresh',
         ));
         $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'pbi_accent_color', array(
-            'label'    => __('Warna Aksen (Emas Amber)', 'pbi-theme'),
+            'label'    => __('Warna Aksen Kustom', 'pbi-theme'),
+            'description' => __('Ubah jika ingin override warna aksen kustom (Default: mengikuti preset).', 'pbi-theme'),
             'section'  => 'pbi_design_section',
             'settings' => 'pbi_accent_color',
         )));
@@ -325,8 +346,22 @@ add_action('customize_register', 'pbi_customize_register');
  */
 if (!function_exists('pbi_customize_css')) {
     function pbi_customize_css() {
-        $primary = get_theme_mod('pbi_primary_color', '#0B4628');
-        $accent  = get_theme_mod('pbi_accent_color', '#D4AF37');
+        $preset = get_theme_mod('pbi_color_preset', 'emerald_gold');
+        $preset_colors = array(
+            'maroon_gold'  => array('primary' => '#9B1C1C', 'accent' => '#D4AF37'),
+            'emerald_gold' => array('primary' => '#0B4628', 'accent' => '#D4AF37'),
+            'blue_gold'    => array('primary' => '#1E3A8A', 'accent' => '#D4AF37'),
+            'teal_gold'    => array('primary' => '#0F766E', 'accent' => '#D4AF37'),
+        );
+
+        $default_primary = isset($preset_colors[$preset]) ? $preset_colors[$preset]['primary'] : '#0B4628';
+        $default_accent  = isset($preset_colors[$preset]) ? $preset_colors[$preset]['accent'] : '#D4AF37';
+
+        $primary_mod = get_theme_mod('pbi_primary_color', '#0B4628');
+        $accent_mod  = get_theme_mod('pbi_accent_color', '#D4AF37');
+
+        $primary = ($primary_mod === '#0B4628') ? $default_primary : $primary_mod;
+        $accent  = ($accent_mod === '#D4AF37') ? $default_accent : $accent_mod;
         ?>
         <style type="text/css">
             :root {
@@ -340,6 +375,45 @@ if (!function_exists('pbi_customize_css')) {
     }
 }
 add_action('wp_head', 'pbi_customize_css');
+
+// Register REST API Route to expose active theme colors to Flutter app
+if (!function_exists('pbi_register_rest_theme_colors_route')) {
+    add_action('rest_api_init', function () {
+        if (!function_exists('pbi_get_rest_theme_colors')) {
+            register_rest_route('pbi/v1', '/theme-colors', array(
+                'methods'             => 'GET',
+                'callback'            => 'pbi_get_rest_theme_colors',
+                'permission_callback' => '__return_true', // Publicly available
+            ));
+        }
+    });
+}
+
+if (!function_exists('pbi_get_rest_theme_colors')) {
+    function pbi_get_rest_theme_colors() {
+        $preset = get_theme_mod('pbi_color_preset', 'emerald_gold');
+        $preset_colors = array(
+            'maroon_gold'  => array('primary' => '#9B1C1C', 'accent' => '#D4AF37'),
+            'emerald_gold' => array('primary' => '#0B4628', 'accent' => '#D4AF37'),
+            'blue_gold'    => array('primary' => '#1E3A8A', 'accent' => '#D4AF37'),
+            'teal_gold'    => array('primary' => '#0F766E', 'accent' => '#D4AF37'),
+        );
+
+        $default_primary = isset($preset_colors[$preset]) ? $preset_colors[$preset]['primary'] : '#0B4628';
+        $default_accent  = isset($preset_colors[$preset]) ? $preset_colors[$preset]['accent'] : '#D4AF37';
+
+        $primary_mod = get_theme_mod('pbi_primary_color', '#0B4628');
+        $accent_mod  = get_theme_mod('pbi_accent_color', '#D4AF37');
+
+        $primary = ($primary_mod === '#0B4628') ? $default_primary : $primary_mod;
+        $accent  = ($accent_mod === '#D4AF37') ? $default_accent : $accent_mod;
+
+        return array(
+            'primary' => $primary,
+            'accent'  => $accent,
+        );
+    }
+}
 
 // Helper functions for brightness and RGB conversion
 function adjust_brightness($hex, $steps) {
