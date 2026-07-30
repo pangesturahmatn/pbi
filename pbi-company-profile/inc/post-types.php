@@ -160,6 +160,48 @@ if (!function_exists('pbi_register_registration_cpt')) {
 add_action('init', 'pbi_register_registration_cpt');
 
 
+// 2c. Register Mentor CPT
+if (!function_exists('pbi_register_mentor_cpt')) {
+    function pbi_register_mentor_cpt() {
+        $labels = array(
+            'name'                  => _x('Mentor PBI', 'Post type general name', 'pbi-theme'),
+            'singular_name'         => _x('Mentor', 'Post type singular name', 'pbi-theme'),
+            'menu_name'             => _x('Mentor PBI', 'Admin Menu text', 'pbi-theme'),
+            'add_new'               => __('Tambah Baru', 'pbi-theme'),
+            'add_new_item'          => __('Tambah Mentor Baru', 'pbi-theme'),
+            'edit_item'             => __('Edit Mentor', 'pbi-theme'),
+            'new_item'              => __('Mentor Baru', 'pbi-theme'),
+            'view_item'             => __('Lihat Mentor', 'pbi-theme'),
+            'all_items'             => __('Semua Mentor', 'pbi-theme'),
+            'search_items'          => __('Cari Mentor', 'pbi-theme'),
+            'not_found'             => __('Mentor tidak ditemukan.', 'pbi-theme'),
+            'not_found_in_trash'    => __('Mentor tidak ditemukan di tempat sampah.', 'pbi-theme'),
+        );
+
+        $args = array(
+            'labels'             => $labels,
+            'public'             => true,
+            'publicly_queryable' => true,
+            'show_ui'            => true,
+            'show_in_menu'       => true,
+            'query_var'          => true,
+            'rewrite'            => array('slug' => 'mentor'),
+            'capability_type'    => 'post',
+            'has_archive'        => true,
+            'hierarchical'       => false,
+            'menu_position'      => 8,
+            'menu_icon'          => 'dashicons-businessman',
+            'supports'           => array('title', 'editor', 'thumbnail'),
+            'show_in_rest'       => true,
+        );
+
+        register_post_type('pbi_mentor', $args);
+    }
+}
+add_action('init', 'pbi_register_mentor_cpt');
+
+
+
 // Register Business Category Taxonomy
 if (!function_exists('pbi_register_business_taxonomy')) {
     function pbi_register_business_taxonomy() {
@@ -285,6 +327,16 @@ if (!function_exists('pbi_add_custom_meta_boxes')) {
             __('Informasi Detail Calon Peserta / Pendaftar', 'pbi-theme'),
             'pbi_render_registration_meta_box',
             'pbi_registration',
+            'normal',
+            'high'
+        );
+
+        // Meta box untuk Mentor PBI CPT
+        add_meta_box(
+            'pbi_mentor_details_meta',
+            __('Informasi Detail & Sosial Media Mentor', 'pbi-theme'),
+            'pbi_render_mentor_meta_box',
+            'pbi_mentor',
             'normal',
             'high'
         );
@@ -512,6 +564,49 @@ if (!function_exists('pbi_render_registration_meta_box')) {
     }
 }
 
+// Render Mentor CPT Meta Box Fields
+if (!function_exists('pbi_render_mentor_meta_box')) {
+    function pbi_render_mentor_meta_box($post) {
+        wp_nonce_field('pbi_save_mentor_meta_nonce', 'pbi_mentor_meta_nonce');
+
+        $specialty = get_post_meta($post->ID, '_pbi_mentor_specialty', true);
+        $facebook  = get_post_meta($post->ID, '_pbi_mentor_facebook', true);
+        $instagram = get_post_meta($post->ID, '_pbi_mentor_instagram', true);
+        $linkedin  = get_post_meta($post->ID, '_pbi_mentor_linkedin', true);
+        $youtube   = get_post_meta($post->ID, '_pbi_mentor_youtube', true);
+        ?>
+        <div class="pbi-meta-wrapper" style="padding: 10px 0;">
+            <p style="margin-bottom: 15px; color: #64748b; font-style: italic;">Isi detail spesialisasi dan tautan media sosial mentor di bawah ini agar alumni dan publik dapat mengenali mereka.</p>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_mentor_specialty">Spesialisasi / Bidang Keilmuan *</label>
+                <input type="text" id="pbi_mentor_specialty" name="pbi_mentor_specialty" value="<?php echo esc_attr($specialty); ?>" placeholder="Contoh: Mentor Spiritual, Mentor Keuangan, Praktisi Ekspor" style="width: 100%; padding: 8px; font-size: 14px;" required />
+            </div>
+
+            <div style="margin-bottom: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px; color: #3b5998;" for="pbi_mentor_facebook"><i class="fa-brands fa-facebook"></i> Link Facebook</label>
+                <input type="url" id="pbi_mentor_facebook" name="pbi_mentor_facebook" value="<?php echo esc_url($facebook); ?>" placeholder="Contoh: https://facebook.com/username" style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px; color: #e1306c;" for="pbi_mentor_instagram"><i class="fa-brands fa-instagram"></i> Link Instagram</label>
+                <input type="url" id="pbi_mentor_instagram" name="pbi_mentor_instagram" value="<?php echo esc_url($instagram); ?>" placeholder="Contoh: https://instagram.com/username" style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px; color: #0077b5;" for="pbi_mentor_linkedin"><i class="fa-brands fa-linkedin"></i> Link LinkedIn</label>
+                <input type="url" id="pbi_mentor_linkedin" name="pbi_mentor_linkedin" value="<?php echo esc_url($linkedin); ?>" placeholder="Contoh: https://linkedin.com/in/username" style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px; color: #ff0000;" for="pbi_mentor_youtube"><i class="fa-brands fa-youtube"></i> Link YouTube Channel</label>
+                <input type="url" id="pbi_mentor_youtube" name="pbi_mentor_youtube" value="<?php echo esc_url($youtube); ?>" placeholder="Contoh: https://youtube.com/c/ChannelName" style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+        </div>
+        <?php
+    }
+}
+
 // Save Meta Box Data
 if (!function_exists('pbi_save_custom_meta_boxes_data')) {
     function pbi_save_custom_meta_boxes_data($post_id) {
@@ -610,6 +705,25 @@ if (!function_exists('pbi_save_custom_meta_boxes_data')) {
             }
             if (isset($_POST['pbi_reg_status'])) {
                 update_post_meta($post_id, '_pbi_reg_status', sanitize_text_field($_POST['pbi_reg_status']));
+            }
+        }
+
+        // Save Mentor Meta Fields
+        if (isset($_POST['pbi_mentor_meta_nonce']) && wp_verify_nonce($_POST['pbi_mentor_meta_nonce'], 'pbi_save_mentor_meta_nonce')) {
+            if (isset($_POST['pbi_mentor_specialty'])) {
+                update_post_meta($post_id, '_pbi_mentor_specialty', sanitize_text_field($_POST['pbi_mentor_specialty']));
+            }
+            if (isset($_POST['pbi_mentor_facebook'])) {
+                update_post_meta($post_id, '_pbi_mentor_facebook', esc_url_raw($_POST['pbi_mentor_facebook']));
+            }
+            if (isset($_POST['pbi_mentor_instagram'])) {
+                update_post_meta($post_id, '_pbi_mentor_instagram', esc_url_raw($_POST['pbi_mentor_instagram']));
+            }
+            if (isset($_POST['pbi_mentor_linkedin'])) {
+                update_post_meta($post_id, '_pbi_mentor_linkedin', esc_url_raw($_POST['pbi_mentor_linkedin']));
+            }
+            if (isset($_POST['pbi_mentor_youtube'])) {
+                update_post_meta($post_id, '_pbi_mentor_youtube', esc_url_raw($_POST['pbi_mentor_youtube']));
             }
         }
     }
