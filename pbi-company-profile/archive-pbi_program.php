@@ -96,9 +96,9 @@ $upcoming_query = new WP_Query($upcoming_args);
             <article id="post-<?php the_ID(); ?>" <?php post_class(); ?> style="background: #ffffff; border: 1px solid #e8edf5; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; box-shadow: 0 2px 12px rgba(0,0,0,0.03);">
 
                 <!-- Thumbnail -->
-                <div style="height: 210px; overflow: hidden; position: relative; background: #f1f5f9;">
+                <div style="height: 210px; overflow: hidden; position: relative; background: #ffffff; display: flex; align-items: center; justify-content: center;">
                     <?php if (has_post_thumbnail()) : ?>
-                        <?php the_post_thumbnail('medium_large', ['style' => 'width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;']); ?>
+                        <?php the_post_thumbnail('medium_large', ['style' => 'width: 100%; height: 100%; object-fit: contain; transition: transform 0.4s ease;']); ?>
                     <?php else : ?>
                         <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(11,70,40,0.08) 0%, rgba(212,175,55,0.12) 100%); gap: 10px;">
                             <i class="fa-solid fa-graduation-cap" style="font-size: 52px; color: var(--pbi-primary); opacity: 0.45;"></i>

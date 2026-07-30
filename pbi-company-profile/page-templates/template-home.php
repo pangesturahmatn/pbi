@@ -307,7 +307,7 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
                                 if ($slug === 'quantum-spiritual-business') {
                                     $img_src = get_template_directory_uri() . '/assets/images/event-quantum.png';
                                     $padding = '0';
-                                    $object_fit = 'cover';
+                                    $object_fit = 'contain';
                                 } else {
                                     $img_src = get_template_directory_uri() . '/assets/images/logo.png';
                                     $padding = '30px';

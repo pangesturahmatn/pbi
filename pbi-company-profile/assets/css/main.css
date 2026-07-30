@@ -494,12 +494,16 @@ body.admin-bar .pbi-header {
 .pbi-card__media {
     height: 200px;
     overflow: hidden;
+    background-color: var(--pbi-bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .pbi-card__media img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .pbi-card--program .pbi-card__body {
