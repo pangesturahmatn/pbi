@@ -133,35 +133,61 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
             wp_reset_postdata();
         }
 
-        // Fallback if no upcoming program
-        if (empty($next_event_date)) {
-            $next_event_date = date('Y-m-d', strtotime('+15 days')); // 15 days from now
-            $next_event_title = 'Event Akbar PBI Camp';
-        }
+        // Check if we have an upcoming event
+        $has_upcoming_event = !empty($next_event_date);
         ?>
-        <div class="pbi-countdown" data-countdown-date="<?php echo esc_attr($next_event_date); ?>" style="align-items: center; text-align: center; display: flex; flex-direction: column; gap: 15px;">
-            <h4 class="pbi-countdown__title" style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--pbi-text-muted); margin: 0;">
-                <i class="fa-regular fa-hourglass-half"></i> <?php echo esc_html($next_event_title); ?>
-            </h4>
-            <div class="pbi-countdown__timer" style="display: flex; gap: 12px; justify-content: center;">
-                <div class="pbi-countdown-box">
-                    <span class="pbi-countdown-box__num" id="pbi-cd-days">00</span>
-                    <span class="pbi-countdown-box__label">Hari</span>
-                </div>
-                <div class="pbi-countdown-box">
-                    <span class="pbi-countdown-box__num" id="pbi-cd-hours">00</span>
-                    <span class="pbi-countdown-box__label">Jam</span>
-                </div>
-                <div class="pbi-countdown-box">
-                    <span class="pbi-countdown-box__num" id="pbi-cd-mins">00</span>
-                    <span class="pbi-countdown-box__label">Menit</span>
-                </div>
-                <div class="pbi-countdown-box">
-                    <span class="pbi-countdown-box__num" id="pbi-cd-secs">00</span>
-                    <span class="pbi-countdown-box__label">Detik</span>
+        <?php if ($has_upcoming_event) : ?>
+            <div class="pbi-countdown" data-countdown-date="<?php echo esc_attr($next_event_date); ?>" style="align-items: center; text-align: center; display: flex; flex-direction: column; gap: 15px;">
+                <h4 class="pbi-countdown__title" style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--pbi-text-muted); margin: 0;">
+                    <i class="fa-regular fa-hourglass-half"></i> <?php echo esc_html($next_event_title); ?>
+                </h4>
+                <div class="pbi-countdown__timer" style="display: flex; gap: 12px; justify-content: center;">
+                    <div class="pbi-countdown-box">
+                        <span class="pbi-countdown-box__num" id="pbi-cd-days">00</span>
+                        <span class="pbi-countdown-box__label">Hari</span>
+                    </div>
+                    <div class="pbi-countdown-box">
+                        <span class="pbi-countdown-box__num" id="pbi-cd-hours">00</span>
+                        <span class="pbi-countdown-box__label">Jam</span>
+                    </div>
+                    <div class="pbi-countdown-box">
+                        <span class="pbi-countdown-box__num" id="pbi-cd-mins">00</span>
+                        <span class="pbi-countdown-box__label">Menit</span>
+                    </div>
+                    <div class="pbi-countdown-box">
+                        <span class="pbi-countdown-box__num" id="pbi-cd-secs">00</span>
+                        <span class="pbi-countdown-box__label">Detik</span>
+                    </div>
                 </div>
             </div>
-        </div>
+        <?php else : ?>
+            <!-- Fallback Widget: Jadwal Baru Segera Hadir -->
+            <div style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 5px 15px;">
+                <h4 style="font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--pbi-primary); margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+                    <span style="display: inline-block; width: 8px; height: 8px; background: #e2b808; border-radius: 50%; animation: pbi_cd_pulse 1.5s infinite;"></span>
+                    Pendaftaran Batch Baru Segera Hadir
+                </h4>
+                <p style="font-size: 12.5px; color: #475569; margin: 0 0 5px; max-width: 480px; line-height: 1.5; font-weight: 500;">
+                    Belum ada program pelatihan aktif terdekat yang dibuka saat ini. Ingin mendapat info jadwal terupdate saat batch baru resmi dibuka?
+                </p>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <a href="<?php echo esc_url(home_url('/program/')); ?>" class="pbi-btn pbi-btn--primary pbi-btn--small" style="font-size: 11px; font-weight: 700; padding: 8px 18px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(11,70,40,0.15);">
+                        <i class="fa-solid fa-list-ul"></i> Lihat Program
+                    </a>
+                    <a href="<?php echo esc_url(home_url('/hubungi-kami/')); ?>" class="pbi-btn pbi-btn--outline pbi-btn--small" style="font-size: 11px; font-weight: 700; padding: 8px 18px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; text-decoration: none; border-color: #cbd5e1; color: #475569; display: inline-flex; align-items: center; gap: 4px; background: transparent;">
+                        <i class="fa-regular fa-envelope"></i> Hubungi Kami
+                    </a>
+                </div>
+            </div>
+            
+            <style>
+            @keyframes pbi_cd_pulse {
+                0% { transform: scale(0.95); opacity: 0.8; }
+                50% { transform: scale(1.15); opacity: 1; }
+                100% { transform: scale(0.95); opacity: 0.8; }
+            }
+            </style>
+        <?php endif; ?>
     </div>
 </div>
 
