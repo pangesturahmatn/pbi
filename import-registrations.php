@@ -274,8 +274,8 @@ foreach ($files_mapping as $item) {
 
     echo "[INFO] Ditemukan " . count($rows) . " baris data.\n";
 
-    // Helper cari index
-    $get_idx = function($keywords) use ($headers) {
+    // Helper cari index (menggunakan referensi headers agar dinamis jika headers di-update di tengah jalan)
+    $get_idx = function($keywords) use (&$headers) {
         foreach ($headers as $idx => $h) {
             foreach ($keywords as $k) {
                 // Jika keyword adalah 'wa' atau 'hp', gunakan regex kata utuh (\b) agar tidak mencocokkan 'kewarganegaraan' atau 'tahapan'
@@ -327,6 +327,37 @@ foreach ($files_mapping as $item) {
     $skip_count    = 0;
 
     foreach ($rows as $r) {
+        // Cek jika baris saat ini merupakan sub-header baru di tengah CSV (tabel ganda yang digabung)
+        $row_lower = array_map('strtolower', $r);
+        $header_indicators = array("nama member", "nama lengkap", "no. telepon", "no. hp", "jenis kelamin", "id card");
+        $match_count = 0;
+        foreach ($row_lower as $val) {
+            foreach ($header_indicators as $indicator) {
+                if (strpos($val, $indicator) !== false) {
+                    $match_count++;
+                }
+            }
+        }
+
+        if ($match_count >= 2) {
+            $headers = array_map(function($h) {
+                return trim(strtolower($h));
+            }, $r);
+
+            // Perbarui index kolom secara dinamis
+            $idx_name     = $get_idx(array("nama lengkap", "nama member", "nama"));
+            $idx_wa       = $get_idx(array("whatsapp", "no whatsapp", "no. hp", "no. telepon", "phone", "kontak", "nomer hp", "no wa", "no. wa", "wa", "hp"));
+            $idx_korda    = $get_idx(array("kota / kabupaten", "kabupaten", "kota", "korda"));
+            $idx_provinsi = $get_idx(array("propinsi", "provinsi"));
+            $idx_alamat   = $get_idx(array("alamat jalan", "alamat lengkap", "alamat rumah"));
+            $idx_biz_name = $get_idx(array("nama bisnis", "nama usaha", "nama perusahaan"));
+            $idx_biz_field= $get_idx(array("bidang bisnis", "bidang usaha"));
+            $idx_gender   = $get_idx(array("jenis kelamin", "kelamin", "gender", "l/p", "sex"));
+
+            echo "[INFO] Terdeteksi sub-header baru di tengah berkas. Indeks kolom diperbarui secara dinamis.\n";
+            continue; // Lewati baris header ini agar tidak diimpor sebagai data
+        }
+
         $raw_wa = isset($r[$idx_wa]) ? $r[$idx_wa] : '';
         $nama = isset($r[$idx_name]) ? trim($r[$idx_name]) : '';
         if (empty($nama)) {
@@ -356,7 +387,7 @@ foreach ($files_mapping as $item) {
         $post_id = 0;
         $is_update = false;
 
-        // Cek duplikasi di WordPress dengan aman (mendukung status 'any' karena post_type pbi_registration ber-status 'private')
+        // Cek duplikasi di WordPress secara aman (Status 'any' karena private post status)
         if (!empty($wa1)) {
             // Jika ada WhatsApp, cari berdasarkan WhatsApp & Event
             $query = new WP_Query(array(
@@ -378,8 +409,14 @@ foreach ($files_mapping as $item) {
                 'posts_per_page' => 1,
                 'fields'         => 'ids'
             ));
-        } else {
-            // Jika WhatsApp kosong, cari berdasarkan Nama (post_title) & Event
+            if ($query->have_posts()) {
+                $post_id = $query->posts[0];
+                $is_update = true;
+            }
+        }
+
+        // Fallback: Jika tidak ditemukan lewat WA, cari berdasarkan Nama & Event (agar tidak duplikat dengan post yang kosong WA-nya)
+        if (!$post_id && !empty($nama) && $nama !== 'Tanpa Nama') {
             $query = new WP_Query(array(
                 'post_type'   => 'pbi_registration',
                 'post_status' => 'any',
@@ -394,12 +431,20 @@ foreach ($files_mapping as $item) {
                 'posts_per_page' => 1,
                 'fields'         => 'ids'
             ));
+            if ($query->have_posts()) {
+                $post_id = $query->posts[0];
+                $is_update = true;
+            }
         }
 
-        if ($query->have_posts()) {
-            $post_ids = $query->posts;
-            $post_id = $post_ids[0];
-            $is_update = true;
+        if ($post_id) {
+            // Update nama jika sebelumnya 'Tanpa Nama' tapi sekarang ada nama valid
+            if ($nama !== 'Tanpa Nama' && get_the_title($post_id) === 'Tanpa Nama') {
+                wp_update_post(array(
+                    'ID'         => $post_id,
+                    'post_title' => $nama
+                ));
+            }
         } else {
             // Buat Post CPT pbi_registration baru
             $post_id = wp_insert_post(array(
@@ -423,16 +468,32 @@ foreach ($files_mapping as $item) {
             $korda_clean = str_replace(array('Kabupaten', 'Kab.'), '', $korda);
             $korda_clean = trim($korda_clean);
 
-            // Isi/Update metadata
-            update_post_meta($post_id, '_pbi_reg_wa', $wa1);
-            update_post_meta($post_id, '_pbi_reg_wa_alt', $wa2); // Simpan nomor alternatif
-            update_post_meta($post_id, '_pbi_reg_korda', $korda_clean);
-            update_post_meta($post_id, '_pbi_reg_provinsi', $provinsi);
-            update_post_meta($post_id, '_pbi_reg_alamat', $alamat);
-            update_post_meta($post_id, '_pbi_reg_nama_usaha', $nama_usaha);
-            update_post_meta($post_id, '_pbi_reg_bidang_usaha', $bidang_usaha);
+            // Isi/Update metadata dengan aman (jangan timpa data valid yang sudah ada dengan data kosong/default)
+            if (!empty($wa1)) {
+                update_post_meta($post_id, '_pbi_reg_wa', $wa1);
+            }
+            if (!empty($wa2)) {
+                update_post_meta($post_id, '_pbi_reg_wa_alt', $wa2);
+            }
+            if ($korda_clean !== '-' && !empty($korda_clean)) {
+                update_post_meta($post_id, '_pbi_reg_korda', $korda_clean);
+            }
+            if ($provinsi !== '-' && !empty($provinsi)) {
+                update_post_meta($post_id, '_pbi_reg_provinsi', $provinsi);
+            }
+            if ($alamat !== '-' && !empty($alamat)) {
+                update_post_meta($post_id, '_pbi_reg_alamat', $alamat);
+            }
+            if ($nama_usaha !== '-' && !empty($nama_usaha)) {
+                update_post_meta($post_id, '_pbi_reg_nama_usaha', $nama_usaha);
+            }
+            if ($bidang_usaha !== '-' && !empty($bidang_usaha)) {
+                update_post_meta($post_id, '_pbi_reg_bidang_usaha', $bidang_usaha);
+            }
             update_post_meta($post_id, '_pbi_reg_event', $item['event']);
-            update_post_meta($post_id, '_pbi_reg_gender', $gender_clean);
+            if ($gender_clean !== '-' && !empty($gender_clean)) {
+                update_post_meta($post_id, '_pbi_reg_gender', $gender_clean);
+            }
 
             if (!$is_update) {
                 update_post_meta($post_id, '_pbi_reg_status', 'PENDING');

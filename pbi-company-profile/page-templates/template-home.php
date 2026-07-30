@@ -323,10 +323,19 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
                             <h3><?php the_title(); ?></h3>
                             <p class="pbi-card__location"><i class="fa-solid fa-map-location-dot"></i> <?php echo esc_html(!empty($p_loc) ? $p_loc : 'Online/TBA'); ?></p>
                             
-                            <div class="pbi-card__actions" style="margin-top: 15px;">
-                                <a href="<?php echo esc_url($target_url); ?>" class="pbi-btn <?php echo esc_attr($status_class); ?> pbi-btn--full" <?php echo ($p_status === 'tutup') ? 'onclick="return false;"' : ''; ?>>
-                                    <?php echo esc_html($status_label); ?>
+                            <div class="pbi-card__actions" style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%;">
+                                <a href="<?php the_permalink(); ?>" class="pbi-btn--card-outline">
+                                    <i class="fa-solid fa-circle-info" style="font-size: 11px;"></i> Info Acara
                                 </a>
+                                <?php if ($p_status === 'tutup') : ?>
+                                    <span class="pbi-btn--card-disabled">
+                                        Ditutup
+                                    </span>
+                                <?php else : ?>
+                                    <a href="<?php echo esc_url(!empty($p_url) ? $p_url : get_the_permalink()); ?>" class="pbi-btn--card-accent">
+                                        <i class="fa-solid fa-pen-to-square" style="font-size: 11px;"></i> Daftar
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -341,8 +350,9 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
                         <span class="pbi-card__meta-date"><i class="fa-regular fa-calendar-days"></i> 10-12 September 2026</span>
                         <h3>PBI Business Bootcamp #1</h3>
                         <p class="pbi-card__location"><i class="fa-solid fa-map-location-dot"></i> Bandung, Jawa Barat</p>
-                        <div class="pbi-card__actions" style="margin-top: 15px;">
-                            <a href="#" class="pbi-btn pbi-btn--accent pbi-btn--full">Daftar Sekarang (Demo)</a>
+                        <div class="pbi-card__actions" style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%;">
+                            <a href="#" class="pbi-btn--card-outline"><i class="fa-solid fa-circle-info" style="font-size: 11px;"></i> Info Acara</a>
+                            <a href="#" class="pbi-btn--card-accent"><i class="fa-solid fa-pen-to-square" style="font-size: 11px;"></i> Daftar</a>
                         </div>
                     </div>
                 </div>
@@ -352,8 +362,9 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
                         <span class="pbi-card__meta-date"><i class="fa-regular fa-calendar-days"></i> 25 September 2026</span>
                         <h3>Kajian Pengusaha Rindu Syurga</h3>
                         <p class="pbi-card__location"><i class="fa-solid fa-map-location-dot"></i> Masjid Raya PBI, Bekasi</p>
-                        <div class="pbi-card__actions" style="margin-top: 15px;">
-                            <a href="#" class="pbi-btn pbi-btn--accent pbi-btn--full">Daftar Sekarang (Demo)</a>
+                        <div class="pbi-card__actions" style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%;">
+                            <a href="#" class="pbi-btn--card-outline"><i class="fa-solid fa-circle-info" style="font-size: 11px;"></i> Info Acara</a>
+                            <a href="#" class="pbi-btn--card-accent"><i class="fa-solid fa-pen-to-square" style="font-size: 11px;"></i> Daftar</a>
                         </div>
                     </div>
                 </div>
@@ -363,8 +374,9 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
                         <span class="pbi-card__meta-date"><i class="fa-regular fa-calendar-days"></i> Setiap Hari Ahad</span>
                         <h3>Majelis Ekonomi Umat</h3>
                         <p class="pbi-card__location"><i class="fa-solid fa-map-location-dot"></i> Aula PBI Tasikmalaya</p>
-                        <div class="pbi-card__actions" style="margin-top: 15px;">
-                            <a href="#" class="pbi-btn pbi-btn--accent pbi-btn--full">Daftar Sekarang (Demo)</a>
+                        <div class="pbi-card__actions" style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%;">
+                            <a href="#" class="pbi-btn--card-outline"><i class="fa-solid fa-circle-info" style="font-size: 11px;"></i> Info Acara</a>
+                            <a href="#" class="pbi-btn--card-accent"><i class="fa-solid fa-pen-to-square" style="font-size: 11px;"></i> Daftar</a>
                         </div>
                     </div>
                 </div>

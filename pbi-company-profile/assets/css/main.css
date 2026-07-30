@@ -1029,3 +1029,68 @@ body.admin-bar .pbi-header {
     cursor: default;
 }
 
+/* Custom Program Card Actions Buttons */
+.pbi-btn--card-outline {
+    background: transparent !important;
+    border: 2px solid var(--pbi-primary) !important;
+    color: var(--pbi-primary) !important;
+    text-decoration: none;
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-align: center;
+    border-radius: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.pbi-btn--card-outline:hover {
+    background: var(--pbi-primary) !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+}
+
+.pbi-btn--card-accent {
+    background: var(--pbi-gold-metallic) !important;
+    color: var(--pbi-primary-dark) !important;
+    border: none !important;
+    text-decoration: none;
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-align: center;
+    border-radius: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(186, 140, 48, 0.2);
+}
+
+.pbi-btn--card-accent:hover {
+    background: var(--pbi-gold-metallic-hover) !important;
+    color: var(--pbi-primary-dark) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(186, 140, 48, 0.3);
+}
+
+.pbi-btn--card-disabled {
+    background-color: var(--pbi-border) !important;
+    color: var(--pbi-text-muted) !important;
+    border: none !important;
+    text-decoration: none;
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-align: center;
+    border-radius: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+

@@ -90,6 +90,8 @@ $upcoming_query = new WP_Query($upcoming_args);
             $prog_location = get_post_meta(get_the_ID(), '_pbi_program_location', true);
             $prog_cd_date  = get_post_meta(get_the_ID(), '_pbi_countdown_target', true);
             $wa_panitia    = get_post_meta(get_the_ID(), '_pbi_program_wa', true);
+            $p_url         = get_post_meta(get_the_ID(), '_pbi_program_reg_url', true);
+            $p_status      = get_post_meta(get_the_ID(), '_pbi_program_status', true);
         ?>
             <article id="post-<?php the_ID(); ?>" <?php post_class(); ?> style="background: #ffffff; border: 1px solid #e8edf5; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; box-shadow: 0 2px 12px rgba(0,0,0,0.03);">
 
@@ -151,14 +153,23 @@ $upcoming_query = new WP_Query($upcoming_args);
                     </p>
 
                     <!-- Actions -->
-                    <div style="display: grid; grid-template-columns: 1fr <?php echo $wa_panitia ? 'auto' : ''; ?>; gap: 10px; margin-top: 10px; padding-top: 14px; border-top: 1px solid #f1f5f9; align-items: center;">
-                        <a href="<?php the_permalink(); ?>" class="pbi-btn pbi-btn--primary" style="text-align: center; text-decoration: none; padding: 10px 18px; border-radius: 30px; font-size: 13px; font-weight: 700; display: block;">
-                            Lihat Detail <i class="fa-solid fa-arrow-right" style="margin-left: 4px;"></i>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr <?php echo $wa_panitia ? 'auto' : ''; ?>; gap: 8px; margin-top: 10px; padding-top: 14px; border-top: 1px solid #f1f5f9; align-items: center;">
+                        <a href="<?php the_permalink(); ?>" class="pbi-btn--card-outline" style="padding: 10px 6px !important; font-size: 12.5px !important; text-decoration: none;">
+                            <i class="fa-solid fa-circle-info" style="font-size: 11px;"></i> Info
                         </a>
+                        <?php if ($p_status === 'tutup') : ?>
+                            <span class="pbi-btn--card-disabled" style="padding: 10px 6px !important; font-size: 12.5px !important;">
+                                Ditutup
+                            </span>
+                        <?php else : ?>
+                            <a href="<?php echo esc_url(!empty($p_url) ? $p_url : get_the_permalink()); ?>" class="pbi-btn--card-accent" style="padding: 10px 6px !important; font-size: 12.5px !important; text-decoration: none;">
+                                <i class="fa-solid fa-pen-to-square" style="font-size: 11px;"></i> Daftar
+                            </a>
+                        <?php endif; ?>
                         <?php if ($wa_panitia) : ?>
                             <a href="https://wa.me/<?php echo esc_attr(preg_replace('/[^0-9]/', '', $wa_panitia)); ?>?text=<?php echo rawurlencode('Assalamualaikum, saya ingin mendaftar program: ' . get_the_title()); ?>"
                                target="_blank" rel="noopener"
-                               style="background: #25d366; color: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; text-decoration: none; box-shadow: 0 4px 12px rgba(37,211,102,0.3); flex-shrink: 0;"
+                               style="background: #25d366; color: #fff; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; text-decoration: none; box-shadow: 0 4px 12px rgba(37,211,102,0.3); flex-shrink: 0;"
                                aria-label="Daftar via WhatsApp">
                                 <i class="fa-brands fa-whatsapp"></i>
                             </a>
@@ -209,6 +220,38 @@ $upcoming_query = new WP_Query($upcoming_args);
         'order'          => 'DESC', // Terbaru di atas
     );
     $past_query = new WP_Query($past_args);
+    
+    // Sort posts in-memory to fix text-based date sorting issues (newest year/post first)
+    if (!empty($past_query->posts)) {
+        usort($past_query->posts, function($a, $b) {
+            $year_a = 2015;
+            $date_a = get_post_meta($a->ID, '_pbi_program_date', true);
+            if ($date_a) {
+                if (preg_match('/\b(20\d{2})\b/', $date_a, $matches)) {
+                    $year_a = intval($matches[1]);
+                } elseif (strtotime($date_a)) {
+                    $year_a = intval(date('Y', strtotime($date_a)));
+                }
+            }
+            
+            $year_b = 2015;
+            $date_b = get_post_meta($b->ID, '_pbi_program_date', true);
+            if ($date_b) {
+                if (preg_match('/\b(20\d{2})\b/', $date_b, $matches)) {
+                    $year_b = intval($matches[1]);
+                } elseif (strtotime($date_b)) {
+                    $year_b = intval(date('Y', strtotime($date_b)));
+                }
+            }
+            
+            if ($year_a !== $year_b) {
+                return $year_b - $year_a; // Descending by year
+            }
+            
+            // If same year, sort by post ID descending (newer posts first)
+            return $b->ID - $a->ID;
+        });
+    }
     ?>
 
     <div class="pbi-past-programs-section" style="margin-top: 80px; padding: 50px 30px; background: #f8fafc; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: inset 0 2px 8px rgba(0,0,0,0.01);">
