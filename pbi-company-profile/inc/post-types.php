@@ -1487,6 +1487,18 @@ function pbi_reg_admin_filter_query($query) {
     }
 }
 
+// Batasi akses CPT Mentor agar hanya bisa dibuka oleh Administrator saat masa uji coba/review
+add_action('template_redirect', 'pbi_restrict_mentor_access');
+function pbi_restrict_mentor_access() {
+    if (is_singular('pbi_mentor') || is_post_type_archive('pbi_mentor')) {
+        if (!current_user_can('manage_options')) {
+            wp_safe_redirect(home_url());
+            exit;
+        }
+    }
+}
+
+
 
 
 
