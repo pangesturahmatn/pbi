@@ -180,11 +180,29 @@ $files_mapping = array(
     array("file" => "BT 16 PONOROGO (Tanggapan) - Form Responses 1.csv", "event" => "Basic Training (BT) 16 - Ponorogo")
 );
 
-// 15 File Batch Baru (bbt-32.csv s/d bbt-46.csv)
+// 15 File Batch Baru (bbt-32.csv s/d bbt-46.csv) dengan nama program asli di database
+$bbt_cities = array(
+    32 => 'Purwokerto',
+    33 => 'Purwokerto',
+    34 => 'Malang',
+    35 => 'Grobogan',
+    36 => 'Purwokerto',
+    37 => 'Batu',
+    38 => 'Purbalingga',
+    39 => 'Surabaya',
+    40 => 'Pekalongan',
+    41 => 'Palopo',
+    42 => 'Tegal',
+    43 => 'Luwu Raya',
+    44 => 'Pati',
+    45 => 'Malang',
+    46 => 'Kebumen'
+);
 for ($i = 32; $i <= 46; $i++) {
+    $city = isset($bbt_cities[$i]) ? ' ' . $bbt_cities[$i] : '';
     $files_mapping[] = array(
         "file" => "bbt-{$i}.csv",
-        "event" => "Basic Training (BT) {$i}"
+        "event" => "BBT {$i}{$city}"
     );
 }
 
@@ -241,8 +259,15 @@ foreach ($files_mapping as $item) {
     $get_idx = function($keywords) use ($headers) {
         foreach ($headers as $idx => $h) {
             foreach ($keywords as $k) {
-                if (strpos($h, $k) !== false) {
-                    return $idx;
+                // Jika keyword adalah 'wa' atau 'hp', gunakan regex kata utuh (\b) agar tidak mencocokkan 'kewarganegaraan' atau 'tahapan'
+                if ($k === 'wa' || $k === 'hp') {
+                    if (preg_match('/\b' . preg_quote($k) . '\b/', $h)) {
+                        return $idx;
+                    }
+                } else {
+                    if (strpos($h, $k) !== false) {
+                        return $idx;
+                    }
                 }
             }
         }
@@ -251,7 +276,7 @@ foreach ($files_mapping as $item) {
 
     // Cari index kolom
     $idx_name     = $get_idx(array("nama lengkap", "nama member", "nama"));
-    $idx_wa       = $get_idx(array("whatsapp", "no whatsapp", "no. hp", "phone", "kontak", "nomer hp", "no wa", "wa"));
+    $idx_wa       = $get_idx(array("whatsapp", "no whatsapp", "no. hp", "phone", "kontak", "nomer hp", "no wa", "no. wa", "wa", "hp"));
     $idx_korda    = $get_idx(array("kota / kabupaten", "kabupaten", "kota", "korda"));
     $idx_provinsi = $get_idx(array("propinsi", "provinsi"));
     $idx_alamat   = $get_idx(array("alamat jalan", "alamat lengkap", "alamat rumah"));
@@ -266,9 +291,14 @@ foreach ($files_mapping as $item) {
             $val_clean = preg_replace('/\D/', '', $val);
             // Jika kolom berisi angka saja dengan panjang nomor telepon (10-15 digit)
             if (strlen($val_clean) >= 10 && strlen($val_clean) <= 15) {
-                $idx_wa = $idx;
-                echo "[INFO] Auto-detect kolom WhatsApp berada di indeks ke-{$idx}\n";
-                break;
+                // Hindari kolom NIK / ID Card (biasanya berawalan 000 atau digit lain tanpa kode telp)
+                // Deteksi nomor telepon valid (berawalan 08, 628, 8, +628, +8, atau mengandung wa.me)
+                $val_trim = trim($val);
+                if (preg_match('/^(08|628|\+628|8|\+8|wa\.me)/', $val_trim) || strpos($val_trim, 'wa.me') !== false) {
+                    $idx_wa = $idx;
+                    echo "[INFO] Auto-detect kolom WhatsApp berada di indeks ke-{$idx}\n";
+                    break;
+                }
             }
         }
     }
