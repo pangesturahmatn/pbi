@@ -15,10 +15,12 @@ if (!function_exists('pbi_theme_enqueue_assets')) {
         wp_enqueue_style('font-awesome-cdn', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', array(), '6.4.0');
 
         // Enqueue Main stylesheet
-        wp_enqueue_style('pbi-main-css', get_template_directory_uri() . '/assets/css/main.css', array(), '1.0.0');
+        $css_ver = file_exists(get_template_directory() . '/assets/css/main.css') ? filemtime(get_template_directory() . '/assets/css/main.css') : '1.0.1';
+        wp_enqueue_style('pbi-main-css', get_template_directory_uri() . '/assets/css/main.css', array(), $css_ver);
 
         // Enqueue Main JavaScript logic
-        wp_enqueue_script('pbi-main-js', get_template_directory_uri() . '/assets/js/main.js', array(), '1.0.0', true);
+        $js_ver  = file_exists(get_template_directory() . '/assets/js/main.js') ? filemtime(get_template_directory() . '/assets/js/main.js') : '1.0.1';
+        wp_enqueue_script('pbi-main-js', get_template_directory_uri() . '/assets/js/main.js', array(), $js_ver, true);
 
         // Pass settings/state to JS if needed
         wp_localize_script('pbi-main-js', 'pbi_theme_obj', array(

@@ -551,8 +551,8 @@ if (!function_exists('pbi_get_rest_theme_colors')) {
         $primary_mod = get_theme_mod('pbi_primary_color', '#0B4628');
         $accent_mod  = get_theme_mod('pbi_accent_color', '#D4AF37');
 
-        $primary = ($primary_mod === '#0B4628') ? $default_primary : $primary_mod;
-        $accent  = ($accent_mod === '#D4AF37') ? $default_accent : $accent_mod;
+        $primary = (strcasecmp($primary_mod, '#0B4628') === 0) ? $default_primary : $primary_mod;
+        $accent  = (strcasecmp($accent_mod, '#D4AF37') === 0) ? $default_accent : $accent_mod;
 
         return array(
             'primary' => $primary,

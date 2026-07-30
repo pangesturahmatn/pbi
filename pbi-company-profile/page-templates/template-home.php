@@ -36,9 +36,28 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
             </div>
         </div>
         
-        <!-- Right Column: Hero Image -->
-        <div class="pbi-hero__image-box" style="z-index: 2; position: relative;">
-            <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/hero-illustration.png'); ?>" alt="PBI Hero Illustration" style="max-width: 100%; height: auto; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); border: 4px solid rgba(255,255,255,0.08); transition: transform 0.3s ease;">
+        <!-- Right Column: Hero Image or Video Embed -->
+        <div class="pbi-hero__image-box" style="z-index: 2; position: relative; width: 100%;">
+            <?php
+            $hero_video_url = get_theme_mod('pbi_hero_video_url', 'https://youtu.be/6Hjynif85ds');
+            $video_id = '';
+            if (!empty($hero_video_url)) {
+                if (preg_match('/embed\/([a-zA-Z0-9_-]+)/', $hero_video_url, $matches)) {
+                    $video_id = $matches[1];
+                } elseif (preg_match('/v=([a-zA-Z0-9_-]+)/', $hero_video_url, $matches)) {
+                    $video_id = $matches[1];
+                } elseif (preg_match('/youtu\.be\/([a-zA-Z0-9_-]+)/', $hero_video_url, $matches)) {
+                    $video_id = $matches[1];
+                }
+            }
+
+            if (!empty($video_id)) : ?>
+                <div class="pbi-hero__video-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); border: 4px solid rgba(255,255,255,0.15);">
+                    <iframe src="https://www.youtube.com/embed/<?php echo esc_attr($video_id); ?>?rel=0" title="Pesantren Bisnis Indonesia Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"></iframe>
+                </div>
+            <?php else : ?>
+                <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/hero-illustration.png'); ?>" alt="PBI Hero Illustration" style="max-width: 100%; height: auto; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); border: 4px solid rgba(255,255,255,0.08); transition: transform 0.3s ease;">
+            <?php endif; ?>
             <!-- Glow effect behind image -->
             <div style="position: absolute; top: 10%; left: 10%; width: 80%; height: 80%; background: radial-gradient(circle, rgba(212,175,55,0.2) 0%, transparent 70%); z-index: -1; pointer-events: none;"></div>
         </div>

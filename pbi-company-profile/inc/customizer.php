@@ -113,6 +113,18 @@ if (!function_exists('pbi_customize_register')) {
             'type'     => 'text',
         ));
 
+        // Hero Video URL
+        $wp_customize->add_setting('pbi_hero_video_url', array(
+            'default'           => 'https://youtu.be/6Hjynif85ds',
+            'sanitize_callback' => 'esc_url_raw',
+        ));
+        $wp_customize->add_control('pbi_hero_video_url', array(
+            'label'       => __('URL Video Hero (YouTube)', 'pbi-theme'),
+            'description' => __('Masukkan link video YouTube (contoh: https://youtu.be/6Hjynif85ds) untuk menggantikan ilustrasi gambar di sebelah kanan hero banner.', 'pbi-theme'),
+            'section'     => 'pbi_homepage_section',
+            'type'        => 'text',
+        ));
+
 
         // 3. Section: Statistik Counter
         $wp_customize->add_section('pbi_stats_section', array(
@@ -360,8 +372,8 @@ if (!function_exists('pbi_customize_css')) {
         $primary_mod = get_theme_mod('pbi_primary_color', '#0B4628');
         $accent_mod  = get_theme_mod('pbi_accent_color', '#D4AF37');
 
-        $primary = ($primary_mod === '#0B4628') ? $default_primary : $primary_mod;
-        $accent  = ($accent_mod === '#D4AF37') ? $default_accent : $accent_mod;
+        $primary = (strcasecmp($primary_mod, '#0B4628') === 0) ? $default_primary : $primary_mod;
+        $accent  = (strcasecmp($accent_mod, '#D4AF37') === 0) ? $default_accent : $accent_mod;
         ?>
         <style type="text/css">
             :root {
