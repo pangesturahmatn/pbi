@@ -119,6 +119,47 @@ if (!function_exists('pbi_register_directory_cpt')) {
 }
 add_action('init', 'pbi_register_directory_cpt');
 
+// 2b. Register Registration / Pendaftar CPT (Private Archive)
+if (!function_exists('pbi_register_registration_cpt')) {
+    function pbi_register_registration_cpt() {
+        $labels = array(
+            'name'                  => _x('Arsip Pendaftar', 'Post type general name', 'pbi-theme'),
+            'singular_name'         => _x('Pendaftar', 'Post type singular name', 'pbi-theme'),
+            'menu_name'             => _x('Arsip Pendaftar', 'Admin Menu text', 'pbi-theme'),
+            'add_new'               => __('Tambah Baru', 'pbi-theme'),
+            'add_new_item'          => __('Tambah Pendaftar Baru', 'pbi-theme'),
+            'edit_item'             => __('Edit Pendaftar', 'pbi-theme'),
+            'new_item'              => __('Pendaftar Baru', 'pbi-theme'),
+            'view_item'             => __('Lihat Pendaftar', 'pbi-theme'),
+            'all_items'             => __('Semua Pendaftar', 'pbi-theme'),
+            'search_items'          => __('Cari Pendaftar', 'pbi-theme'),
+            'not_found'             => __('Pendaftar tidak ditemukan.', 'pbi-theme'),
+            'not_found_in_trash'    => __('Pendaftar tidak ditemukan di tempat sampah.', 'pbi-theme'),
+        );
+
+        $args = array(
+            'labels'             => $labels,
+            'public'             => false, // Penting: Jangan publikasikan ke web frontend (akses privat internal)
+            'publicly_queryable' => false,
+            'show_ui'            => true,
+            'show_in_menu'       => true,
+            'query_var'          => true,
+            'rewrite'            => false,
+            'capability_type'    => 'post',
+            'has_archive'        => false,
+            'hierarchical'       => false,
+            'menu_position'      => 7,
+            'menu_icon'          => 'dashicons-id-alt',
+            'supports'           => array('title'), // Cukup judul (Nama Pendaftar)
+            'show_in_rest'       => true,
+        );
+
+        register_post_type('pbi_registration', $args);
+    }
+}
+add_action('init', 'pbi_register_registration_cpt');
+
+
 // Register Business Category Taxonomy
 if (!function_exists('pbi_register_business_taxonomy')) {
     function pbi_register_business_taxonomy() {
@@ -234,6 +275,16 @@ if (!function_exists('pbi_add_custom_meta_boxes')) {
             __('Informasi Detail Usaha / UMKM Member', 'pbi-theme'),
             'pbi_render_directory_meta_box',
             'pbi_directory',
+            'normal',
+            'high'
+        );
+
+        // Meta box untuk Arsip Pendaftar CPT
+        add_meta_box(
+            'pbi_registration_details_meta',
+            __('Informasi Detail Calon Peserta / Pendaftar', 'pbi-theme'),
+            'pbi_render_registration_meta_box',
+            'pbi_registration',
             'normal',
             'high'
         );
@@ -392,6 +443,75 @@ if (!function_exists('pbi_render_directory_meta_box')) {
     }
 }
 
+// Render Registration CPT Meta Box Fields
+if (!function_exists('pbi_render_registration_meta_box')) {
+    function pbi_render_registration_meta_box($post) {
+        wp_nonce_field('pbi_save_registration_meta_nonce', 'pbi_registration_meta_nonce');
+
+        $wa           = get_post_meta($post->ID, '_pbi_reg_wa', true);
+        $korda        = get_post_meta($post->ID, '_pbi_reg_korda', true);
+        $provinsi     = get_post_meta($post->ID, '_pbi_reg_provinsi', true);
+        $alamat       = get_post_meta($post->ID, '_pbi_reg_alamat', true);
+        $nama_usaha   = get_post_meta($post->ID, '_pbi_reg_nama_usaha', true);
+        $bidang_usaha = get_post_meta($post->ID, '_pbi_reg_bidang_usaha', true);
+        $event        = get_post_meta($post->ID, '_pbi_reg_event', true);
+        $status       = get_post_meta($post->ID, '_pbi_reg_status', true);
+
+        if (empty($status)) {
+            $status = 'PENDING';
+        }
+        ?>
+        <div class="pbi-meta-wrapper" style="padding: 10px 0;">
+            <p style="margin-bottom: 15px; color: #64748b; font-style: italic;">Informasi arsip data pendaftar Google Form / Calon Peserta Basic Training (BT) PBI.</p>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_reg_wa">No. WhatsApp / HP</label>
+                <input type="text" id="pbi_reg_wa" name="pbi_reg_wa" value="<?php echo esc_attr($wa); ?>" placeholder="Contoh: 628..." style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_reg_korda">Korda / Kabupaten</label>
+                <input type="text" id="pbi_reg_korda" name="pbi_reg_korda" value="<?php echo esc_attr($korda); ?>" placeholder="Contoh: Brebes" style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_reg_provinsi">Provinsi</label>
+                <input type="text" id="pbi_reg_provinsi" name="pbi_reg_provinsi" value="<?php echo esc_attr($provinsi); ?>" placeholder="Contoh: Jawa Tengah" style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_reg_alamat">Alamat Lengkap</label>
+                <textarea id="pbi_reg_alamat" name="pbi_reg_alamat" rows="3" style="width: 100%; padding: 8px; font-size: 14px;"><?php echo esc_textarea($alamat); ?></textarea>
+            </div>
+
+            <div style="margin-bottom: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_reg_nama_usaha">Nama Bisnis / Usaha</label>
+                <input type="text" id="pbi_reg_nama_usaha" name="pbi_reg_nama_usaha" value="<?php echo esc_attr($nama_usaha); ?>" placeholder="Contoh: Bakso Barokah" style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_reg_bidang_usaha">Bidang Usaha</label>
+                <input type="text" id="pbi_reg_bidang_usaha" name="pbi_reg_bidang_usaha" value="<?php echo esc_attr($bidang_usaha); ?>" placeholder="Contoh: Kuliner" style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_reg_event">Event Sumber / Batch Pendaftaran</label>
+                <input type="text" id="pbi_reg_event" name="pbi_reg_event" value="<?php echo esc_attr($event); ?>" placeholder="Contoh: Basic Training (BT) 18 - Jabodetabek" style="width: 100%; padding: 8px; font-size: 14px;" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;" for="pbi_reg_status">Status Pendaftaran</label>
+                <select id="pbi_reg_status" name="pbi_reg_status" style="width: 100%; padding: 8px; font-size: 14px;">
+                    <option value="PENDING" <?php selected($status, 'PENDING'); ?>>PENDING (Menunggu Seleksi)</option>
+                    <option value="LOLOS" <?php selected($status, 'LOLOS'); ?>>LOLOS (Terverifikasi Alumni)</option>
+                    <option value="TIDAK_LOLOS" <?php selected($status, 'TIDAK_LOLOS'); ?>>TIDAK LOLOS</option>
+                </select>
+            </div>
+        </div>
+        <?php
+    }
+}
+
 // Save Meta Box Data
 if (!function_exists('pbi_save_custom_meta_boxes_data')) {
     function pbi_save_custom_meta_boxes_data($post_id) {
@@ -461,6 +581,35 @@ if (!function_exists('pbi_save_custom_meta_boxes_data')) {
             }
             if (isset($_POST['pbi_business_price'])) {
                 update_post_meta($post_id, '_pbi_business_price', sanitize_text_field($_POST['pbi_business_price']));
+            }
+        }
+
+        // Save Registration Meta Fields
+        if (isset($_POST['pbi_registration_meta_nonce']) && wp_verify_nonce($_POST['pbi_registration_meta_nonce'], 'pbi_save_registration_meta_nonce')) {
+            if (isset($_POST['pbi_reg_wa'])) {
+                $clean_wa = preg_replace('/[^0-9]/', '', $_POST['pbi_reg_wa']);
+                update_post_meta($post_id, '_pbi_reg_wa', sanitize_text_field($clean_wa));
+            }
+            if (isset($_POST['pbi_reg_korda'])) {
+                update_post_meta($post_id, '_pbi_reg_korda', sanitize_text_field($_POST['pbi_reg_korda']));
+            }
+            if (isset($_POST['pbi_reg_provinsi'])) {
+                update_post_meta($post_id, '_pbi_reg_provinsi', sanitize_text_field($_POST['pbi_reg_provinsi']));
+            }
+            if (isset($_POST['pbi_reg_alamat'])) {
+                update_post_meta($post_id, '_pbi_reg_alamat', sanitize_textarea_field($_POST['pbi_reg_alamat']));
+            }
+            if (isset($_POST['pbi_reg_nama_usaha'])) {
+                update_post_meta($post_id, '_pbi_reg_nama_usaha', sanitize_text_field($_POST['pbi_reg_nama_usaha']));
+            }
+            if (isset($_POST['pbi_reg_bidang_usaha'])) {
+                update_post_meta($post_id, '_pbi_reg_bidang_usaha', sanitize_text_field($_POST['pbi_reg_bidang_usaha']));
+            }
+            if (isset($_POST['pbi_reg_event'])) {
+                update_post_meta($post_id, '_pbi_reg_event', sanitize_text_field($_POST['pbi_reg_event']));
+            }
+            if (isset($_POST['pbi_reg_status'])) {
+                update_post_meta($post_id, '_pbi_reg_status', sanitize_text_field($_POST['pbi_reg_status']));
             }
         }
     }
