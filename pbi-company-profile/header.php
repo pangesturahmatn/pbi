@@ -57,6 +57,24 @@
 
             <!-- Navigation Links -->
             <nav id="pbi-site-nav" class="pbi-nav">
+                <!-- Mobile Menu Top Logo Branding -->
+                <div class="pbi-nav__mobile-logo">
+                    <?php
+                    if (has_custom_logo()) {
+                        $custom_logo_id = get_theme_mod('custom_logo');
+                        $logo = wp_get_attachment_image_src($custom_logo_id, 'full');
+                        if ($logo) {
+                            echo '<a href="' . esc_url(home_url('/')) . '"><img src="' . esc_url($logo[0]) . '" alt="' . esc_attr(get_bloginfo('name')) . '" style="max-height: 50px; width: auto; display: inline-block;"></a>';
+                        }
+                    } else {
+                        $default_logo = get_template_directory_uri() . '/assets/images/logo.png';
+                        echo '<a href="' . esc_url(home_url('/')) . '" style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">';
+                        echo '<img src="' . esc_url($default_logo) . '" alt="' . esc_attr(get_bloginfo('name')) . '" style="max-height: 45px; width: auto; display: block;">';
+                        echo '<span style="font-family: var(--pbi-font-headings); font-weight: 700; font-size: 15px; color: var(--pbi-primary); text-align: left; line-height: 1.2;">Pesantren Bisnis<br><span style="color: var(--pbi-accent); font-size: 11px; font-weight:600;">Indonesia</span></span>';
+                        echo '</a>';
+                    }
+                    ?>
+                </div>
                 <?php
                 wp_nav_menu(array(
                     'theme_location' => 'primary',

@@ -17,6 +17,32 @@ $upcoming_args = array(
     'post_type'      => 'pbi_program',
     'posts_per_page' => 6,
     'paged'          => $paged,
+    'meta_query'     => array(
+        'relation' => 'AND',
+        array(
+            'key'     => '_pbi_program_status',
+            'value'   => 'buka',
+            'compare' => '='
+        ),
+        array(
+            'relation' => 'OR',
+            array(
+                'key'     => '_pbi_program_countdown_target',
+                'compare' => 'NOT EXISTS'
+            ),
+            array(
+                'key'     => '_pbi_program_countdown_target',
+                'value'   => '',
+                'compare' => '='
+            ),
+            array(
+                'key'     => '_pbi_program_countdown_target',
+                'value'   => date('Y-m-d'),
+                'compare' => '>=',
+                'type'    => 'DATE'
+            )
+        )
+    )
 );
 if ($riwayat_id) {
     $upcoming_args['tax_query'] = array(
@@ -88,7 +114,7 @@ $upcoming_query = new WP_Query($upcoming_args);
             $prog_date     = get_post_meta(get_the_ID(), '_pbi_program_date', true);
             $prog_time     = get_post_meta(get_the_ID(), '_pbi_program_time', true);
             $prog_location = get_post_meta(get_the_ID(), '_pbi_program_location', true);
-            $prog_cd_date  = get_post_meta(get_the_ID(), '_pbi_countdown_target', true);
+            $prog_cd_date  = get_post_meta(get_the_ID(), '_pbi_program_countdown_target', true);
             $wa_panitia    = get_post_meta(get_the_ID(), '_pbi_program_wa', true);
             $p_url         = get_post_meta(get_the_ID(), '_pbi_program_reg_url', true);
             $p_status      = get_post_meta(get_the_ID(), '_pbi_program_status', true);

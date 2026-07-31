@@ -78,8 +78,9 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
     padding-bottom: 80px;
 }
 .pbi-hero__image-box {
-    display: none;
+    display: block; /* Show video/image on mobile by default */
     text-align: center;
+    margin-top: 30px;
 }
 .pbi-hero__image-box img:hover {
     transform: translateY(-5px);
@@ -94,7 +95,39 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
         padding-right: 20px;
     }
     .pbi-hero__image-box {
-        display: block !important;
+        margin-top: 0;
+    }
+}
+
+/* Premium shimmering effect for red background */
+.pbi-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: skewX(-25deg);
+    z-index: 1;
+    pointer-events: none;
+    animation: pbi-shimmer-shine 7s infinite ease-in-out;
+}
+
+@keyframes pbi-shimmer-shine {
+    0% {
+        left: -150%;
+    }
+    30% {
+        left: 150%;
+    }
+    100% {
+        left: 150%;
     }
 }
 </style>
@@ -103,7 +136,7 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
 <div class="pbi-container">
     <div class="pbi-widget-bar" style="max-width: 600px; margin: -60px auto 40px auto; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);">
         <?php
-        // Find next event date
+        // Find next event date using the machine-readable target countdown date
         $next_event_date = '';
         $next_event_title = 'Pelatihan Terdekat PBI';
         
@@ -111,15 +144,20 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
             'post_type'      => 'pbi_program',
             'posts_per_page' => 1,
             'post_status'    => 'publish',
-            'meta_key'       => '_pbi_program_date',
+            'meta_key'       => '_pbi_program_countdown_target',
             'orderby'        => 'meta_value',
             'order'          => 'ASC',
             'meta_query'     => array(
                 array(
-                    'key'     => '_pbi_program_date',
+                    'key'     => '_pbi_program_countdown_target',
                     'value'   => date('Y-m-d'),
                     'compare' => '>=',
                     'type'    => 'DATE'
+                ),
+                array(
+                    'key'     => '_pbi_program_status',
+                    'value'   => 'buka',
+                    'compare' => '='
                 )
             )
         ));
@@ -127,7 +165,7 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
         if ($next_event_query->have_posts()) {
             while ($next_event_query->have_posts()) {
                 $next_event_query->the_post();
-                $next_event_date = get_post_meta(get_the_ID(), '_pbi_program_date', true);
+                $next_event_date = get_post_meta(get_the_ID(), '_pbi_program_countdown_target', true);
                 $next_event_title = get_the_title();
             }
             wp_reset_postdata();
@@ -272,7 +310,33 @@ $stat_regions = get_theme_mod('pbi_stat_region_count', 34);
             $program_query = new WP_Query(array(
                 'post_type'      => 'pbi_program',
                 'posts_per_page' => 3,
-                'post_status'    => 'publish'
+                'post_status'    => 'publish',
+                'meta_query'     => array(
+                    'relation' => 'AND',
+                    array(
+                        'key'     => '_pbi_program_status',
+                        'value'   => 'buka',
+                        'compare' => '='
+                    ),
+                    array(
+                        'relation' => 'OR',
+                        array(
+                            'key'     => '_pbi_program_countdown_target',
+                            'compare' => 'NOT EXISTS'
+                        ),
+                        array(
+                            'key'     => '_pbi_program_countdown_target',
+                            'value'   => '',
+                            'compare' => '='
+                        ),
+                        array(
+                            'key'     => '_pbi_program_countdown_target',
+                            'value'   => date('Y-m-d'),
+                            'compare' => '>=',
+                            'type'    => 'DATE'
+                        )
+                    )
+                )
             ));
 
             if ($program_query->have_posts()) : 

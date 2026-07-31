@@ -297,6 +297,10 @@ body.admin-bar .pbi-header {
     color: var(--pbi-primary);
 }
 
+.pbi-nav__mobile-logo {
+    display: none;
+}
+
 .pbi-nav {
     display: flex;
     align-items: center;
@@ -352,6 +356,15 @@ body.admin-bar .pbi-header {
         display: flex;
     }
     
+    .pbi-nav__mobile-logo {
+        display: block !important;
+        width: 100%;
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        margin-bottom: 10px;
+    }
+    
     .pbi-nav {
         position: fixed;
         top: 0;
@@ -361,11 +374,13 @@ body.admin-bar .pbi-header {
         background-color: #FFFFFF;
         box-shadow: -10px 0 30px rgba(0,0,0,0.05);
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         z-index: 99999;
-        gap: 40px;
+        gap: 30px;
+        padding: 60px 24px;
+        overflow-y: auto;
     }
     
     .pbi-nav.active {
